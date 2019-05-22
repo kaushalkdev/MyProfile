@@ -25,6 +25,12 @@ dependencies:
   cupertino_icons: ^0.1.2
   firebase_auth:
   google_sign_in:
+  rxdart:
+  cloud_firestore:
+  firebase_storage:
+  image_picker:
+  image_cropper:
+
 
 dev_dependencies:
   flutter_test:

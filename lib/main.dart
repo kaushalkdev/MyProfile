@@ -1,114 +1,327 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:io';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+  FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
-    );
+    return MaterialApp(title: 'FlutterBase', home: Root());
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+class Root extends StatefulWidget {
+  FirebaseAuth firebaseAuth;
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
+  FirebaseAuth auth = FirebaseAuth.instance;
+  FirebaseUser user;
+  GoogleSignIn googleSignIn;
 
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+  Root({this.firebaseAuth, this.user, this.googleSignIn});
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _RootState createState() => _RootState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+//enum AuthStatus {
+//  signedIn,
+//  notSignedIn,
+//}
 
-  void _incrementCounter() {
+class _RootState extends State<Root> {
+  AuthStatus authStatus = AuthStatus.notSignedIn;
+
+  @override
+  void initState() {
+    super.initState();
+
+    widget.auth.onAuthStateChanged.listen((firebaseUser){
+//
+      if(firebaseUser != null){
+        authStatus = AuthStatus.signedIn;
+
+      }else{
+        authStatus = AuthStatus.notSignedIn;
+      }
+
+    });
+
+//    if (widget.auth != null) {
+//      authStatus = AuthStatus.signedIn;
+//    } else {
+//      authStatus = AuthStatus.notSignedIn;
+//    }
+  }
+
+//  void signedIn() {
+//    setState(() {
+//      authStatus = AuthStatus.signedIn;
+//    });
+//  }
+//
+//  void signedOut() {
+//    setState(() {
+//      authStatus = AuthStatus.notSignedIn;
+//    });
+//  }
+
+  @override
+  Widget build(BuildContext context) {
+    switch (authStatus) {
+      case AuthStatus.signedIn:
+        return new userProfile(
+          onSignedOut: signedOut,
+        );
+
+      case AuthStatus.notSignedIn:
+        return new loginUser(
+          onSingnedIn: signedIn,
+        );
+    }
+
+    return null;
+  }
+}
+
+
+
+
+class loginUser extends StatefulWidget {
+  final VoidCallback onSingnedIn;
+
+  loginUser({this.onSingnedIn});
+
+  @override
+  _loginUserState createState() => _loginUserState();
+}
+enum AuthStatus {
+  signedIn,
+  notSignedIn,
+}
+
+
+
+
+class _loginUserState extends State<loginUser> {
+
+  AuthStatus authStatus = AuthStatus.notSignedIn;
+
+
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final Firestore _db = Firestore.instance;
+
+  Future<FirebaseUser> googleSignIn() async {
+// Start
+
+    // Step 1
+    GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+
+    // Step 2
+    GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+    final AuthCredential credential = GoogleAuthProvider.getCredential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+    final FirebaseUser user = await _auth.signInWithCredential(credential);
+    // Step 3
+
+    userProfile( firebaseUser: user, googleSignIn: _googleSignIn);
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) => userProfile(
+                  firebaseUser: user,
+                  googleSignIn: _googleSignIn,
+                )));
+    return user;
+  }
+
+
+  void signedIn() {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      authStatus = AuthStatus.signedIn;
     });
   }
 
+  void signedOut() {
+    setState(() {
+      authStatus = AuthStatus.notSignedIn;
+    });
+  }
+
+
+
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    _auth.onAuthStateChanged.listen((firebaseUser){
+//
+      if(firebaseUser != null){
+        authStatus = AuthStatus.signedIn;
+
+      }else{
+        authStatus = AuthStatus.notSignedIn;
+      }
+
+    });
+
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+
+    switch (authStatus) {
+      case AuthStatus.signedIn:
+        return new userProfile(
+
+        );
+
+      case AuthStatus.notSignedIn:
+        return Scaffold(
+          appBar: AppBar(
+            title: Text("login"),
+          ),
+          body: RaisedButton(
+            child: Text("sign in with google"),
+            onPressed: googleSignIn,
+          ),
+        );
+    }
+
+
+
+  }
+}
+
+class userProfile extends StatefulWidget {
+  final FirebaseUser firebaseUser;
+  final GoogleSignIn googleSignIn;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+
+  void signOut() {
+    _auth.signOut();
+    _googleSignIn.signOut();
+  }
+
+  userProfile({this.firebaseUser, this.googleSignIn});
+
+  @override
+  _userProfileState createState() => _userProfileState();
+}
+
+
+
+
+
+
+
+class _userProfileState extends State<userProfile> {
+  File _image;
+  FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+
+
+
+  //method to get, crop, upload and update image
+  Future getImage() async {
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      _image = image;
+    });
+
+    File croppedFile = await ImageCropper.cropImage(
+      sourcePath: _image.path,
+      ratioX: 1.0,
+      ratioY: 1.0,
+      maxWidth: 512,
+      maxHeight: 512,
+    );
+
+    String fileName = widget.firebaseUser.uid;
+    StorageReference firebaseStorageRef =
+        FirebaseStorage.instance.ref().child(fileName);
+    StorageUploadTask uploadTask = firebaseStorageRef.putFile(croppedFile);
+
+    StorageTaskSnapshot snapshot = await uploadTask.onComplete;
+    String url = await (await uploadTask.onComplete).ref.getDownloadURL();
+
+    Firestore.instance
+        .collection('users')
+        .document(widget.firebaseUser.uid)
+        .setData({"photoURL": url}, merge: true);
+  }
+
+
+
+
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: Text('User profile'),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
-            ),
-          ],
-        ),
+      body: Column(
+        children: <Widget>[
+          RaisedButton(
+            child: Text("signout"),
+            onPressed: () {
+              widget.signOut();
+              Navigator.pushReplacement(
+                  context, MaterialPageRoute(builder: (context) => Root()));
+            },
+          ),
+          IconButton(
+              icon: Icon(Icons.camera_alt),
+              onPressed: () {
+                getImage();
+              }),
+          StreamBuilder(
+              stream: Firestore.instance
+                  .collection('users')
+                  .document("xy2dXCUupBgl3aotCF8BEFIIbVA3")
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return new Text("Loading");
+                }
+                var userDocument = snapshot.data;
+                return ClipOval(
+                    child: SizedBox(
+                        height: 180.0,
+                        width: 180.0,
+                        child: Image.network(userDocument['photoURL'])));
+              }),
+          StreamBuilder(
+              stream: Firestore.instance
+                  .collection('users')
+                  .document("xy2dXCUupBgl3aotCF8BEFIIbVA3")
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return new Text("Loading");
+                }
+                var userDocument = snapshot.data;
+                return Text(userDocument['displayName']);
+              }),
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
