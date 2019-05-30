@@ -34,6 +34,7 @@ dependencies:
   flutter_auth_buttons:
 
 
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -54,6 +55,9 @@ flutter:
   assets:
     - assets/userimage.png
     - assets/googleimage.jpg
+    - assets/profileApp.png
+    - assets/defaultimage.png
+
   #  - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

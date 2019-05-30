@@ -29,8 +29,8 @@ class AuthService {
         return Observable.just({});
       }
     });
-  }
 
+  }
 
   Future<FirebaseUser> googleSignIn() async {
 // Start
@@ -41,7 +41,6 @@ class AuthService {
 
     // Step 2
     GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-
 
     final AuthCredential credential = GoogleAuthProvider.getCredential(
       accessToken: googleAuth.accessToken,
@@ -59,10 +58,7 @@ class AuthService {
     return user;
   }
 
-
-
-  Future<String> getCurrentuser() async{
-
+  Future<String> getCurrentuser() async {
     FirebaseUser user = await FirebaseAuth.instance.currentUser();
 
     return user.uid;
