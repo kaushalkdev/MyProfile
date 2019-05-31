@@ -27,6 +27,15 @@ class _EducationFormState extends State<EducationForm> {
     'description': null,
   };
 
+  Widget progress(bool visibility) {
+    return Visibility(
+        child: CircularProgressIndicator(
+          valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF26D2DC)),
+        ),
+        visible: visibility);
+  }
+
+
   @override
   void initState() {
     // TODO: implement initState
@@ -46,6 +55,7 @@ class _EducationFormState extends State<EducationForm> {
         .collection(userId)
         .add(personalMap)
         .whenComplete(() {
+          progress(false);
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -71,6 +81,7 @@ class _EducationFormState extends State<EducationForm> {
                   _formKey.currentState.save();
 
                   updateDatabase(userId, _educationallMap);
+                  progress(true);
                 }
               },
             ),

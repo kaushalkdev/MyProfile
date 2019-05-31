@@ -86,6 +86,15 @@ class _TechnicalFormState extends State<TechnicalForm> {
     });
   }
 
+  Widget progress(bool visibility) {
+    return Visibility(
+        child: CircularProgressIndicator(
+          valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF26D2DC)),
+          backgroundColor: Colors.green,
+        ),
+        visible: visibility);
+  }
+
   Future updateDatabase(String userId, Map<String, dynamic> personalMap) async {
     Firestore.instance
         .collection('users')
@@ -93,6 +102,7 @@ class _TechnicalFormState extends State<TechnicalForm> {
         .collection(userId)
         .add(personalMap)
         .whenComplete(() {
+
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -117,6 +127,7 @@ class _TechnicalFormState extends State<TechnicalForm> {
                 _formKey.currentState.save();
 
                 updateDatabase(userid, _technicalMap);
+                progress(true);
               }
             },
           ),

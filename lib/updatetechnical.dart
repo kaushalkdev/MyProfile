@@ -51,8 +51,8 @@ class _UpdateTechnicalFormState extends State<UpdateTechnicalForm> {
     final picked = await showDatePicker(
         context: context,
         initialDate: _duedate,
-        firstDate: DateTime(2018),
-        lastDate: DateTime(2080));
+        firstDate: DateTime(2009),
+        lastDate: DateTime(2020));
 
     if (picked != null) {
       setState(() {
@@ -70,8 +70,8 @@ class _UpdateTechnicalFormState extends State<UpdateTechnicalForm> {
     final picked = await showDatePicker(
         context: context,
         initialDate: _duedate,
-        firstDate: DateTime(2018),
-        lastDate: DateTime(2080));
+        firstDate: DateTime(2009),
+        lastDate: DateTime(2020));
 
     if (picked != null) {
       setState(() {

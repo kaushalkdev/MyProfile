@@ -93,6 +93,7 @@ class _EducationalDetailsState extends State<EducationalDetails> {
   }
 
   Widget buildListItem(BuildContext context, DocumentSnapshot document) {
+    progress(false);
     return Dismissible(
       key: Key(document.documentID),
       onDismissed: (DismissDirection direction) {
@@ -105,71 +106,83 @@ class _EducationalDetailsState extends State<EducationalDetails> {
             .document(document.documentID)
             .delete();
       },
-      child: Padding(
-        padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-        child: ListTile(
-          leading: Icon(
-            Icons.account_balance,
-            size: 30.0,
-          ),
-          title: Text(document['institute'],
-              style: TextStyle(
-                  fontSize: 18.0,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold)),
-          subtitle: Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Container(
-              child: Column(children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Text(document['degree'],
-                        style:
-                            TextStyle(fontSize: 16.0, color: Colors.blueGrey)),
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(document['field'],
-                          style: TextStyle(
-                              fontSize: 16.0, color: Colors.blueGrey)),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: Text(
-                          document['startyear'] + ' - ' + document['endyear'],
-                          style: TextStyle(
-                              fontSize: 16.0, fontWeight: FontWeight.bold)),
-                    ),
-                  ],
-                ),
-              ]),
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+          child: ListTile(
+            leading: Icon(
+              Icons.account_balance,
+              size: 30.0,
             ),
+            title: Text(document['institute'],
+                style: TextStyle(
+                    fontSize: 18.0,
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold)),
+            subtitle: Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Container(
+                child: Column(children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Text(document['degree'],
+                          style:
+                              TextStyle(fontSize: 16.0, color: Colors.blueGrey)),
+                    ],
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(document['field'],
+                            style: TextStyle(
+                                fontSize: 16.0, color: Colors.blueGrey)),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                            document['startyear'] + ' - ' + document['endyear'],
+                            style: TextStyle(
+                                fontSize: 16.0, fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                  ),
+                ]),
+              ),
+            ),
+            trailing: IconButton(
+                icon: Icon(Icons.edit),
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                              UpdateEducationDetails(
+                                institute: document['institute'],
+                                description: document['degree'],
+                                degree: document['field'],
+                                startyear: document['startyear'],
+                                endyear: document['endyear'],
+                                field: document['field'],
+                              )));
+                }),
           ),
-          trailing: IconButton(
-              icon: Icon(Icons.edit),
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (BuildContext context) => UpdateEducationDetails(
-                          institute:document['institute'],
-                          description:document['degree'] ,
-                          degree: document['field'],
-                          startyear:document['startyear'] ,
-                          endyear: document['endyear'],
-                          field:document['field'],
-
-                        )));
-              }),
         ),
       ),
     );
+  }
+
+  Widget progress(bool visibility) {
+    return Visibility(
+        child: SizedBox(
+          child: CircularProgressIndicator(
+            valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF26D2DC)),
+          ),
+        ),
+        visible: visibility);
   }
 
   @override
@@ -202,7 +215,9 @@ class _EducationalDetailsState extends State<EducationalDetails> {
           child: _buildButtons(),
         ),
         body: Column(
+
           children: <Widget>[
+            SizedBox(height: 10,),
             Expanded(
               child: Container(
                 width: MediaQuery.of(context).size.width,
@@ -214,7 +229,9 @@ class _EducationalDetailsState extends State<EducationalDetails> {
                         .collection(userid)
                         .snapshots(),
                     builder: (context, snapshot) {
-                      if (!snapshot.hasData) return const Text('Loading....');
+                      if (!snapshot.hasData) {
+                        return Container(child: Center(child: progress(true)));
+                      }
                       return ListView.builder(
                         itemCount: snapshot.data.documents.length,
                         itemBuilder: (context, index) => buildListItem(

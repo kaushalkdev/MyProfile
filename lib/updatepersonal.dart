@@ -57,18 +57,18 @@ class _UpdatePersonalDetailsState extends State<UpdatePersonalDetails> {
         context: context,
         initialDate: _duedate,
         firstDate: DateTime(1980),
-        lastDate: DateTime(2010));
+        lastDate: DateTime(2022));
+
 
     if (picked != null) {
       setState(() {
         _duedate = picked;
         _dateText = "${picked.day}/${picked.month}/${picked.year}";
-
         _personalMap['birthday'] = _dateText;
       });
     } else {
       _dateText = "${_duedate.day}/${_duedate.month}/${_duedate.year}";
-      _personalMap['enddate'] = _dateText;
+      _personalMap['birthday'] = _dateText;
     }
   }
 
@@ -76,21 +76,20 @@ class _UpdatePersonalDetailsState extends State<UpdatePersonalDetails> {
   void initState() {
     super.initState();
 
-    this.name = name;
-    this.email = email;
-    this.gender = gender;
-    this.birthday = birthday;
-    this.address = address;
+    this.name = widget.name;
+    this.email = widget.email;
+    this.gender = widget.gender;
+    this.birthday = widget.birthday;
+    this.address = widget.address;
     if (gender == 'Male') {
       groupValue = 1;
     } else {
       groupValue = 2;
     }
+
     _dateText = birthday;
-
-    _dateText = "${_duedate.day}/${_duedate.month}/${_duedate.year}";
     _personalMap['birthday'] = _dateText;
-
+    _personalMap['gender'] = 'Male';
     widget.authService.getCurrentuser().then((userId) {
       setState(() {
         this.userId = userId;

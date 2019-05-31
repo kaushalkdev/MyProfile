@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'main.dart';
 import 'dart:async';
-import 'package:flutter/scheduler.dart' show timeDilation;
 
 class WelcomeScreen extends StatefulWidget {
   @override
@@ -9,17 +8,15 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
-
   bool _visibility = false;
 
-  Widget progress(bool visibility)
-  {
-    timeDilation = 1.6;
-    return   Visibility(child:CircularProgressIndicator(
-      valueColor:   new AlwaysStoppedAnimation<Color>(Color(0xFF26D2DC)),
-    ), visible: visibility );
+  Widget progress(bool visibility) {
+    return Visibility(
+        child: CircularProgressIndicator(
+          valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF26D2DC)),
+        ),
+        visible: visibility);
   }
-
 
   @override
   void initState() {
@@ -29,20 +26,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           context, MaterialPageRoute(builder: (context) => loginUser()));
     });
 
-    Future.delayed(Duration(seconds: 3),(){
-
+    Future.delayed(Duration(seconds: 3), () {
       setState(() {
-
         _visibility = true;
-
       });
-
     });
   }
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -64,8 +53,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 ),
               ],
             ),
-
-             progress(_visibility)
+            progress(_visibility)
           ],
         ),
       ),

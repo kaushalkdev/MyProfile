@@ -80,6 +80,13 @@ class _ProfessionalFormState extends State<ProfessionalForm> {
 
   }
 
+  Widget progress(bool visibility) {
+    return Visibility(
+        child: CircularProgressIndicator(
+          valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF26D2DC)),
+        ),
+        visible: visibility);
+  }
 
   Future updateDatabase(String userId, Map<String, dynamic> personalMap) async {
     Firestore.instance
@@ -88,6 +95,7 @@ class _ProfessionalFormState extends State<ProfessionalForm> {
         .collection(userId)
         .add(personalMap)
         .whenComplete(() {
+          progress(false);
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -115,6 +123,7 @@ class _ProfessionalFormState extends State<ProfessionalForm> {
                    _formKey.currentState.save();
 
                    updateDatabase(userid, _professionalMap);
+
                  }
 
               },
@@ -324,7 +333,6 @@ class _ProfessionalFormState extends State<ProfessionalForm> {
 
   Widget appear(BuildContext context, bool valu) {
     if (valu) {
-
         _professionalMap['endyear'] = 'present';
 
         _professionalMap['endmonth'] = '';

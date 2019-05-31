@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'auth.dart';
 
 class EditPersonalDetails extends StatefulWidget {
-
   AuthService authService = new AuthService();
 
   @override
@@ -12,7 +11,6 @@ class EditPersonalDetails extends StatefulWidget {
 }
 
 class _EditPersonalDetailsState extends State<EditPersonalDetails> {
-
   String userId = '';
   final Map<String, dynamic> _personalMap = {
     'name': null,
@@ -43,20 +41,18 @@ class _EditPersonalDetailsState extends State<EditPersonalDetails> {
     final picked = await showDatePicker(
         context: context,
         initialDate: _duedate,
-        firstDate: DateTime(2080),
-        lastDate: DateTime(2010));
+        firstDate: DateTime(1980),
+        lastDate: DateTime(2030));
 
     if (picked != null) {
       setState(() {
         _duedate = picked;
         _dateText = "${picked.day}/${picked.month}/${picked.year}";
 
-          _personalMap['birthday'] = _dateText;
-
+        _personalMap['birthday'] = _dateText;
       });
-    }
-    else{
-      _dateText =  "${_duedate.day}/${_duedate.month}/${_duedate.year}";
+    } else {
+      _dateText = "${_duedate.day}/${_duedate.month}/${_duedate.year}";
       _personalMap['enddate'] = _dateText;
     }
   }
@@ -67,6 +63,7 @@ class _EditPersonalDetailsState extends State<EditPersonalDetails> {
     _dateText = "${_duedate.day}/${_duedate.month}/${_duedate.year}";
     _personalMap['birthday'] = _dateText;
 
+    groupValue = 1;
     widget.authService.getCurrentuser().then((userId) {
       setState(() {
         this.userId = userId;
@@ -88,14 +85,12 @@ class _EditPersonalDetailsState extends State<EditPersonalDetails> {
               onPressed: () {
                 if (!_formKey.currentState.validate()) {
                   return;
-                }else{
+                } else {
                   _formKey.currentState.save();
 
-                  updateDatabase(userId , _personalMap);
-
+                  updateDatabase(userId, _personalMap);
+                  progress(true);
                 }
-
-
               },
             ),
           ],
@@ -120,8 +115,7 @@ class _EditPersonalDetailsState extends State<EditPersonalDetails> {
                           return 'Please fill the name';
                         }
                       },
-
-                      onSaved: (String value){
+                      onSaved: (String value) {
                         _personalMap['name'] = value;
                       },
                     ),
@@ -137,7 +131,7 @@ class _EditPersonalDetailsState extends State<EditPersonalDetails> {
                           return 'Please fill EmailId';
                         }
                       },
-                      onSaved: (String value){
+                      onSaved: (String value) {
                         _personalMap['email'] = value;
                       },
                     ),
@@ -227,7 +221,7 @@ class _EditPersonalDetailsState extends State<EditPersonalDetails> {
                           return 'Please enter the address';
                         }
                       },
-                      onSaved: (String value){
+                      onSaved: (String value) {
                         _personalMap['address'] = value;
                       },
                     ),
@@ -239,23 +233,26 @@ class _EditPersonalDetailsState extends State<EditPersonalDetails> {
         ));
   }
 
+  Widget progress(bool visibility) {
+    return Visibility(
+        child: CircularProgressIndicator(
+          valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF26D2DC)),
+        ),
+        visible: visibility);
+  }
 
-
-
-  Future updateDatabase(String userId, Map<String,dynamic> personalMap) async {
+  Future updateDatabase(String userId, Map<String, dynamic> personalMap) async {
     Firestore.instance
         .collection('personal')
-         .document(userId)
-         .setData(personalMap)
-        .whenComplete((){
+        .document(userId)
+        .setData(personalMap)
+        .whenComplete(() {
+      progress(false);
+
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
               builder: (BuildContext context) => PersonalDetails()));
     });
-
-
   }
-
-
 }

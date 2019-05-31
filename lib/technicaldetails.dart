@@ -7,6 +7,7 @@ import 'main.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'auth.dart';
 import 'updatetechnical.dart';
+import 'package:flutter/scheduler.dart' show timeDilation;
 
 class TechnicalDetails extends StatefulWidget {
   AuthService authService = AuthService();
@@ -82,6 +83,7 @@ class _TechnicalDetailsState extends State<TechnicalDetails> {
   }
 
   Widget buildListItem(BuildContext context, DocumentSnapshot document) {
+    progress(false);
     return Dismissible(
         key: Key(document.documentID),
         onDismissed: (DismissDirection direction) {
@@ -94,74 +96,84 @@ class _TechnicalDetailsState extends State<TechnicalDetails> {
               .document(document.documentID)
               .delete();
         },
-        child: Padding(
-          padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-          child: ListTile(
-            leading: Icon(
-              Icons.account_balance,
-              size: 30.0,
-            ),
-            title: Text(document['company'],
-                style: TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold)),
-            subtitle: Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: Container(
-                child: Column(children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      Text(document['projectname'],
-                          style: TextStyle(
-                              fontSize: 16.0,
-                              color: Colors.blueGrey,
-                              fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Text(document['startdate'] + ' - ' + document['enddate'],
-                          style: TextStyle(
-                              fontSize: 16.0,
-                              color: Colors.blueGrey,
-                              fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 8.0,
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Text(document['description'],
-                            style: TextStyle(
-                              fontSize: 16.0,
-                            )),
-                      ),
-                    ],
-                  ),
-                ]),
+        child: Card(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+            child: ListTile(
+              leading: Icon(
+                Icons.account_balance,
+                size: 30.0,
               ),
+              title: Text(document['company'],
+                  style: TextStyle(
+                      fontSize: 20.0,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold)),
+              subtitle: Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Container(
+                  child: Column(children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Text(document['projectname'],
+                            style: TextStyle(
+                                fontSize: 16.0,
+                                color: Colors.blueGrey,
+                                fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Text(document['startdate'] + ' - ' + document['enddate'],
+                            style: TextStyle(
+                                fontSize: 16.0,
+                                color: Colors.blueGrey,
+                                fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 8.0,
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Text(document['description'],
+                              style: TextStyle(
+                                fontSize: 16.0,
+                              )),
+                        ),
+                      ],
+                    ),
+                  ]),
+                ),
+              ),
+              trailing: IconButton(
+                  icon: Icon(Icons.edit),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                UpdateTechnicalForm(
+                                  institute: document['company'],
+                                  projectname: document['projectname'],
+                                  startdate: document['startdate'],
+                                  enddate: document['enddate'],
+                                  descriptiom: document['description'],
+                                  documentref: document.documentID,
+                                )));
+                  }),
             ),
-            trailing: IconButton(
-                icon: Icon(Icons.edit),
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (BuildContext context) =>
-                              UpdateTechnicalForm(
-                                institute: document['company'],
-                                projectname: document['projectname'],
-                                startdate: document['startdate'],
-                                enddate: document['enddate'],
-                                descriptiom: document['description'],
-                                documentref: document.documentID,
-                              )));
-                }),
           ),
         ));
+  }
+
+  Widget progress(bool visibility) {
+    return Visibility(
+        child: CircularProgressIndicator(
+          valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF26D2DC)),
+        ),
+        visible: visibility);
   }
 
   @override
@@ -206,8 +218,10 @@ class _TechnicalDetailsState extends State<TechnicalDetails> {
         ),
         body: Column(
           children: <Widget>[
+          SizedBox(height: 10,),
             Expanded(
               child: Container(
+
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height,
                 child: StreamBuilder(
@@ -217,7 +231,10 @@ class _TechnicalDetailsState extends State<TechnicalDetails> {
                         .collection(userid)
                         .snapshots(),
                     builder: (context, snapshot) {
-                      if (!snapshot.hasData) return const Text('Loading....');
+                      if (!snapshot.hasData) {
+                        return Container(child: Center(child: progress(true)));
+                      }
+
                       return ListView.builder(
                         itemCount: snapshot.data.documents.length,
                         itemBuilder: (context, index) => buildListItem(

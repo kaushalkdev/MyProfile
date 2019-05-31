@@ -5,16 +5,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'professionaldetails.dart';
 import 'educationdetails.dart';
 import 'editpersonal.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'updatepersonal.dart';
 import 'main.dart';
 
 class PersonalDetails extends StatefulWidget {
   AuthService authService = new AuthService();
-  String name = '';
-  String email = '';
-  String birthday = '';
-  String gender = '';
-  String address = '';
 
   @override
   _PersonalDetailsState createState() => _PersonalDetailsState();
@@ -103,6 +99,7 @@ class _PersonalDetailsState extends State<PersonalDetails> {
           }
           var userDocument = snapshot.data;
 
+          setuserValues(userDocument);
 
           return ListTile(
             leading: Icon(
@@ -130,8 +127,6 @@ class _PersonalDetailsState extends State<PersonalDetails> {
             return new Text(" ");
           }
           var userDocument = snapshot.data;
-
-
 
           return ListTile(
             leading: Icon(
@@ -214,7 +209,6 @@ class _PersonalDetailsState extends State<PersonalDetails> {
           }
           var userDocument = snapshot.data;
 
-
           return ListTile(
             leading: Icon(
               Icons.home,
@@ -230,10 +224,6 @@ class _PersonalDetailsState extends State<PersonalDetails> {
         });
   }
 
-
-
-
-
   @override
   void initState() {
     // TODO: implement initState
@@ -246,11 +236,30 @@ class _PersonalDetailsState extends State<PersonalDetails> {
       });
     });
 
-    Firestore.instance
-        .collection('users')
-        .document(userId)
-        .snapshots();
+    StreamBuilder(
+        stream: Firestore.instance
+            .collection('personal')
+            .document(userId)
+            .snapshots(),
+        builder: (context, snapshot) {
+          var userDocument = snapshot.data;
+          if (!snapshot.hasData) {
+            this.Address = userDocument['address'];
 
+            this.Birthday = userDocument['birthday'];
+
+            this.Email = userDocument['email'];
+          }
+        });
+    Name = 'kaushal';
+  }
+
+  Widget progress(bool visibility) {
+    return Visibility(
+        child: CircularProgressIndicator(
+          valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF26D2DC)),
+        ),
+        visible: visibility);
   }
 
   @override
@@ -267,6 +276,18 @@ class _PersonalDetailsState extends State<PersonalDetails> {
           actions: <Widget>[
             IconButton(
                 icon: Icon(
+                  Icons.add,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                              EditPersonalDetails()));
+                }),
+            IconButton(
+                icon: Icon(
                   Icons.edit,
                   color: Colors.white,
                 ),
@@ -276,12 +297,11 @@ class _PersonalDetailsState extends State<PersonalDetails> {
                       MaterialPageRoute(
                           builder: (BuildContext context) =>
                               UpdatePersonalDetails(
-                                address: Address ,
-                                birthday:Birthday,
-                                name:Name ,
+                                address: Address,
+                                birthday: Birthday,
+                                name: Name,
                                 gender: Gender,
                                 email: Email,
-
                               )));
                 })
           ],
@@ -290,43 +310,83 @@ class _PersonalDetailsState extends State<PersonalDetails> {
         bottomNavigationBar: BottomAppBar(
           child: _buildButtons(),
         ),
-        body: ListView(
+        body:Column(
           children: <Widget>[
-            Stack(
-              children: <Widget>[
-                Column(
-                  children: <Widget>[
-                    SizedBox(
-                      height: 20,
-                    ),
-                    name(context, userId),
-                    Divider(),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    dob(context, userId),
-                    Divider(),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    email(context, userId),
-                    Divider(),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    gender(context, userId),
-                    Divider(),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    address(context, userId),
-                  ],
-                ),
-              ],
+            Expanded(
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
+                child: StreamBuilder(
+                    stream: Firestore.instance
+                        .collection('users')
+                        .document(userId)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return Center(child: progress(true));
+                      }
+                      return         ListView(
+                        children: <Widget>[
+                          Stack(
+                            children: <Widget>[
+                              Column(
+                                children: <Widget>[
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                  name(context, userId),
+                                  Divider(),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  dob(context, userId),
+                                  Divider(),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  email(context, userId),
+                                  Divider(),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  gender(context, userId),
+                                  Divider(),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  address(context, userId),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      );
+                    }),
+              ),
             ),
           ],
         ),
+
+
+
+
       ),
     );
+  }
+
+  Future setuserValues(userDocument) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('gender', userDocument['gender']);
+    await prefs.setString('name', userDocument['name']);
+    await prefs.setString('email', userDocument['email']);
+    await prefs.setString('birthday', userDocument['birthday']);
+    await prefs.setString('address', userDocument['address']);
+    setState(() {
+      Gender = prefs.get('gender');
+      Address = prefs.get('address');
+      Name = prefs.get('name');
+      Email = prefs.get('email');
+      Birthday = prefs.get('birthday');
+    });
   }
 }
