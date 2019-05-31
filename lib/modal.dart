@@ -52,6 +52,7 @@ class Modal {
               GestureDetector(
                 onTap: () {
                   authService.signOut();
+                  Navigator.pop(context);
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
