@@ -115,11 +115,13 @@ class _TechnicalDetailsState extends State<TechnicalDetails> {
                   child: Column(children: <Widget>[
                     Row(
                       children: <Widget>[
-                        Text(document['projectname'],
-                            style: TextStyle(
-                                fontSize: 16.0,
-                                color: Colors.blueGrey,
-                                fontWeight: FontWeight.bold)),
+                        Expanded(
+                          child: Text(document['projectname'],
+                              style: TextStyle(
+                                  fontSize: 16.0,
+                                  color: Colors.blueGrey,
+                                  fontWeight: FontWeight.bold)),
+                        ),
                       ],
                     ),
                     Row(

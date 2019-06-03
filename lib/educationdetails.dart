@@ -125,9 +125,11 @@ class _EducationalDetailsState extends State<EducationalDetails> {
                 child: Column(children: <Widget>[
                   Row(
                     children: <Widget>[
-                      Text(document['degree'],
-                          style:
-                              TextStyle(fontSize: 16.0, color: Colors.blueGrey)),
+                      Expanded(
+                        child: Text(document['degree'],
+                            style:
+                                TextStyle(fontSize: 16.0, color: Colors.blueGrey)),
+                      ),
                     ],
                   ),
                   Row(
@@ -162,11 +164,12 @@ class _EducationalDetailsState extends State<EducationalDetails> {
                           builder: (BuildContext context) =>
                               UpdateEducationDetails(
                                 institute: document['institute'],
-                                description: document['degree'],
-                                degree: document['field'],
+                                description: document['description'],
+                                degree: document['degree'],
                                 startyear: document['startyear'],
                                 endyear: document['endyear'],
                                 field: document['field'],
+                                documentRef: document.documentID,
                               )));
                 }),
           ),

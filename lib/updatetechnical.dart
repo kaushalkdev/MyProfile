@@ -47,6 +47,8 @@ class _UpdateTechnicalFormState extends State<UpdateTechnicalForm> {
   DateTime _duedate = DateTime.now();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
+  bool onpress;
+
   Future<Null> _selectStartDate(BuildContext context) async {
     final picked = await showDatePicker(
         context: context,
@@ -88,7 +90,7 @@ class _UpdateTechnicalFormState extends State<UpdateTechnicalForm> {
   @override
   void initState() {
     super.initState();
-
+    onpress = false;
     this.institute = widget.institute;
     this.projectname = widget.projectname;
     this.startdate = widget.startdate;
@@ -115,11 +117,22 @@ class _UpdateTechnicalFormState extends State<UpdateTechnicalForm> {
         .document(documentref)
         .setData(personalMap)
         .whenComplete(() {
+      progress(false);
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
               builder: (BuildContext context) => TechnicalDetails()));
     });
+  }
+
+  Widget progress(bool visibility) {
+    return Visibility(
+        child: Center(
+          child: CircularProgressIndicator(
+            valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF26D2DC)),
+          ),
+        ),
+        visible: visibility);
   }
 
   @override
@@ -139,210 +152,220 @@ class _UpdateTechnicalFormState extends State<UpdateTechnicalForm> {
                 _formKey.currentState.save();
 
                 updateDatabase(userid, _technicalMap);
+                setState(() {
+                  onpress = true;
+                });
               }
             },
           ),
         ],
         backgroundColor: Color(0xFF26D2DC),
       ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          children: <Widget>[
-            Column(
-              children: <Widget>[
-                SizedBox(
-                  height: 5.0,
-                ),
-                Text(
-                  'Project Details',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.0),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(
-                  height: 5.0,
-                ),
-                new ListTile(
-                  leading: const Icon(Icons.account_balance),
-                  title: new TextFormField(
-                    initialValue: institute,
-                    decoration: new InputDecoration(
-                      hintText: "Institute/Company",
-                    ),
-                    validator: (String value) {
-                      if (value.isEmpty) {
-                        return 'Please fill the Institute/Company Name';
-                      }
-                    },
-                    onSaved: (String value) {
-                      _technicalMap['company'] = value;
-                    },
-                  ),
-                ),
-                Divider(),
-                new ListTile(
-                  leading: const Icon(Icons.face),
-                  title: new TextFormField(
-                    initialValue: projectname,
-                    decoration: new InputDecoration(
-                      hintText: "Project Name",
-                    ),
-                    validator: (String value) {
-                      if (value.isEmpty) {
-                        return 'Please fill Project Name';
-                      }
-                    },
-                    onSaved: (String value) {
-                      _technicalMap['projectname'] = value;
-                    },
-                  ),
-                ),
-                Divider(),
-                new ListTile(
-                  leading: const Icon(Icons.today),
-                  title: const Text('Start Date'),
-                  subtitle: Text(_dateStart),
-                  trailing: GestureDetector(
-                    onTap: () {
-                      _selectStartDate(context);
-                    },
-                    child: const Icon(
-                      Icons.edit,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ),
-                Divider(),
-                new ListTile(
-                  leading: const Icon(Icons.today),
-                  title: const Text('End Date'),
-                  subtitle: Text(_dateEnd),
-                  trailing: GestureDetector(
-                    onTap: () {
-                      _selectEndDate(context);
-                    },
-                    child: const Icon(
-                      Icons.edit,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ),
-                Divider(),
-                new ListTile(
-                  leading: const Icon(Icons.library_books),
-                  title: new TextFormField(
-                    maxLines: 3,
-                    decoration: new InputDecoration(
-                      enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.grey,
-                            width: 1.0,
-                            style: BorderStyle.solid,
-                          ),
-                          borderRadius: BorderRadius.all(Radius.circular(5.0))),
-                      focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.blue,
-                            width: 1.0,
-                            style: BorderStyle.solid,
-                          ),
-                          borderRadius: BorderRadius.all(Radius.circular(5.0))),
-                      hintText: "Description",
-                    ),
-                    initialValue: descriptiom,
-                    validator: (String value) {
-                      if (value.isEmpty) {
-                        return 'Please enter Description';
-                      }
-                    },
-                    onSaved: (String value) {
-                      _technicalMap['description'] = value;
-                    },
-                  ),
-                ),
-                Divider(
-                  color: Color(0xFF26D2DC),
-                ),
-                SizedBox(
-                  height: 5.0,
-                ),
-                Text(
-                  'Add your Skills',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.0),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(
-                  height: 5.0,
-                ),
-                new ListTile(
-                  title: Container(
-                    width: 90.0,
-                    child: new TextFormField(
-                      maxLines: 3,
-                      decoration: new InputDecoration(
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.grey,
-                              width: 1.0,
-                              style: BorderStyle.solid,
-                            ),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(5.0))),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.blue,
-                              width: 1.0,
-                              style: BorderStyle.solid,
-                            ),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(5.0))),
-                        hintText: "Skills",
+      body: (onpress == true)
+          ? progress(true)
+          : Form(
+              key: _formKey,
+              child: ListView(
+                children: <Widget>[
+                  Column(
+                    children: <Widget>[
+                      SizedBox(
+                        height: 5.0,
                       ),
-                    ),
-                  ),
-                  trailing: FlatButton(
-                    child: Text(
-                      'Add +',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    color: Color(0xFF26D2DC),
-                    onPressed: () {
-                      showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: Text('Skills'),
-                              content: TextField(
-                                  decoration: InputDecoration(
-                                hintText: 'Add Skills',
-                                enabledBorder: OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: Color(0xFF26D2DC))),
-                                focusedBorder: OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: Color(0xFF26D2DC))),
-                              )),
-                              actions: <Widget>[
-                                FlatButton(
-                                  child: Text(
-                                    'Add',
-                                    style: TextStyle(color: Color(0xFF26D2DC)),
+                      Text(
+                        'Project Details',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 15.0),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(
+                        height: 5.0,
+                      ),
+                      new ListTile(
+                        leading: const Icon(Icons.account_balance),
+                        title: new TextFormField(
+                          initialValue: institute,
+                          decoration: new InputDecoration(
+                            hintText: "Institute/Company",
+                          ),
+                          validator: (String value) {
+                            if (value.isEmpty) {
+                              return 'Please fill the Institute/Company Name';
+                            }
+                          },
+                          onSaved: (String value) {
+                            _technicalMap['company'] = value;
+                          },
+                        ),
+                      ),
+                      Divider(),
+                      new ListTile(
+                        leading: const Icon(Icons.face),
+                        title: new TextFormField(
+                          initialValue: projectname,
+                          decoration: new InputDecoration(
+                            hintText: "Project Name",
+                          ),
+                          validator: (String value) {
+                            if (value.isEmpty) {
+                              return 'Please fill Project Name';
+                            }
+                          },
+                          onSaved: (String value) {
+                            _technicalMap['projectname'] = value;
+                          },
+                        ),
+                      ),
+                      Divider(),
+                      new ListTile(
+                        leading: const Icon(Icons.today),
+                        title: const Text('Start Date'),
+                        subtitle: Text(_dateStart),
+                        trailing: GestureDetector(
+                          onTap: () {
+                            _selectStartDate(context);
+                          },
+                          child: const Icon(
+                            Icons.edit,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
+                      Divider(),
+                      new ListTile(
+                        leading: const Icon(Icons.today),
+                        title: const Text('End Date'),
+                        subtitle: Text(_dateEnd),
+                        trailing: GestureDetector(
+                          onTap: () {
+                            _selectEndDate(context);
+                          },
+                          child: const Icon(
+                            Icons.edit,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
+                      Divider(),
+                      new ListTile(
+                        leading: const Icon(Icons.library_books),
+                        title: new TextFormField(
+                          maxLines: 3,
+                          decoration: new InputDecoration(
+                            enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.grey,
+                                  width: 1.0,
+                                  style: BorderStyle.solid,
+                                ),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(5.0))),
+                            focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.blue,
+                                  width: 1.0,
+                                  style: BorderStyle.solid,
+                                ),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(5.0))),
+                            hintText: "Description",
+                          ),
+                          initialValue: descriptiom,
+                          validator: (String value) {
+                            if (value.isEmpty) {
+                              return 'Please enter Description';
+                            }
+                          },
+                          onSaved: (String value) {
+                            _technicalMap['description'] = value;
+                          },
+                        ),
+                      ),
+                      Divider(
+                        color: Color(0xFF26D2DC),
+                      ),
+                      SizedBox(
+                        height: 5.0,
+                      ),
+                      Text(
+                        'Add your Skills',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 15.0),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(
+                        height: 5.0,
+                      ),
+                      new ListTile(
+                        title: Container(
+                          width: 90.0,
+                          child: new TextFormField(
+                            maxLines: 3,
+                            decoration: new InputDecoration(
+                              enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.grey,
+                                    width: 1.0,
+                                    style: BorderStyle.solid,
                                   ),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                )
-                              ],
-                            );
-                          });
-                    },
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(5.0))),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.blue,
+                                    width: 1.0,
+                                    style: BorderStyle.solid,
+                                  ),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(5.0))),
+                              hintText: "Skills",
+                            ),
+                          ),
+                        ),
+                        trailing: FlatButton(
+                          child: Text(
+                            'Add +',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          color: Color(0xFF26D2DC),
+                          onPressed: () {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: Text('Skills'),
+                                    content: TextField(
+                                        decoration: InputDecoration(
+                                      hintText: 'Add Skills',
+                                      enabledBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                              color: Color(0xFF26D2DC))),
+                                      focusedBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                              color: Color(0xFF26D2DC))),
+                                    )),
+                                    actions: <Widget>[
+                                      FlatButton(
+                                        child: Text(
+                                          'Add',
+                                          style: TextStyle(
+                                              color: Color(0xFF26D2DC)),
+                                        ),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                      )
+                                    ],
+                                  );
+                                });
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ],
-        ),
-      ),
     );
   }
 }

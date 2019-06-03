@@ -14,8 +14,6 @@ class EducationForm extends StatefulWidget {
 }
 
 class _EducationFormState extends State<EducationForm> {
-
-
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String userId = '';
   final Map<String, dynamic> _educationallMap = {
@@ -27,14 +25,17 @@ class _EducationFormState extends State<EducationForm> {
     'description': null,
   };
 
+  var onpress;
+
   Widget progress(bool visibility) {
     return Visibility(
-        child: CircularProgressIndicator(
-          valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF26D2DC)),
+        child: Center(
+          child: CircularProgressIndicator(
+            valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF26D2DC)),
+          ),
         ),
         visible: visibility);
   }
-
 
   @override
   void initState() {
@@ -46,6 +47,7 @@ class _EducationFormState extends State<EducationForm> {
         this.userId = userid;
       });
     });
+    onpress = false;
   }
 
   Future updateDatabase(String userId, Map<String, dynamic> personalMap) async {
@@ -55,7 +57,7 @@ class _EducationFormState extends State<EducationForm> {
         .collection(userId)
         .add(personalMap)
         .whenComplete(() {
-          progress(false);
+      progress(false);
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -81,169 +83,187 @@ class _EducationFormState extends State<EducationForm> {
                   _formKey.currentState.save();
 
                   updateDatabase(userId, _educationallMap);
-                  progress(true);
+                  setState(() {
+                    onpress = true;
+                  });
                 }
               },
             ),
-
           ],
         ),
-        body: Form(
-          key: _formKey,
-          child: ListView(
-            children: <Widget>[
-              new Column(
-                children: <Widget>[
-                  SizedBox(
-                    height: 5.0,
-                  ),
-                  new ListTile(
-                    leading: const Icon(Icons.account_balance),
-                    title: new TextFormField(
-                      decoration: new InputDecoration(
-                        hintText: "Institute/University",
-                      ),
-                      validator: (String value) {
-                        if (value.isEmpty) {
-                          return 'Please fill the Institute/University';
-                        }
-                      },
-                      onSaved: (String value) {
-                        _educationallMap['institute'] = value;
-                      },
-                    ),
-                  ),
-                  new ListTile(
-                    leading: const Icon(Icons.school),
-                    title: new TextFormField(
-                      decoration: new InputDecoration(
-                        hintText: "Degree",
-                      ),
-                      validator: (String value) {
-                        if (value.isEmpty) {
-                          return 'Please fill Degree';
-                        }
-                      },
-
-                      onSaved: (String value) {
-                        _educationallMap['degree'] = value;
-                      },
-
-                    ),
-                  ),
-                  new ListTile(
-                    leading: const Icon(Icons.local_library),
-                    title: new TextFormField(
-                      decoration: new InputDecoration(
-                        hintText: "Field of Study",
-                      ),
-                      validator: (String value) {
-                        if (value.isEmpty) {
-                          return 'Please fill Field of Study';
-                        }
-                      },
-
-                      onSaved: (String value) {
-                        _educationallMap['field'] = value;
-                      },
-                    ),
-                  ),
-                  Divider(),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                    child: Row(
+        body: (onpress == true)
+            ? progress(true)
+            : Form(
+                key: _formKey,
+                child: ListView(
+                  children: <Widget>[
+                    new Column(
                       children: <Widget>[
                         SizedBox(
-                          width: 18.0,
+                          height: 5.0,
                         ),
-                        Icon(
-                          Icons.today,
-                          color: Colors.grey,
-                        ),
-                        SizedBox(
-                          width: 25.0,
-                        ),
-                        Container(
-                          width: 90.0,
-                          child: TextFormField(
+                        new ListTile(
+                          leading: const Icon(Icons.account_balance),
+                          title: new TextFormField(
                             decoration: new InputDecoration(
-                              hintText: "Start Year",
+                              hintText: "Institute/University",
                             ),
                             validator: (String value) {
-                              if (value.isEmpty) {
-                                return 'Please fill Start Year';
+                              if (value.isEmpty ||
+                                  RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
+                                      .hasMatch(value)) {
+                                return 'Please fill valid Institute/University';
                               }
                             },
-
                             onSaved: (String value) {
-                              _educationallMap['startyear'] = value;
+                              _educationallMap['institute'] = value;
                             },
                           ),
                         ),
-                        SizedBox(
-                          width: 40.0,
-                        ),
-                        Container(
-                          width: 90.0,
-                          child: TextFormField(
+                        new ListTile(
+                          leading: const Icon(Icons.school),
+                          title: new TextFormField(
                             decoration: new InputDecoration(
-                              hintText: "End Year",
+                              hintText: "Degree",
                             ),
                             validator: (String value) {
-                              if (value.isEmpty) {
-                                return 'Please fill End Year';
+                              if (value.isEmpty ||
+                                  RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
+                                      .hasMatch(value)) {
+                                return 'Please fill valid Degree';
                               }
                             },
-
                             onSaved: (String value) {
-                              _educationallMap['endyear'] = value;
+                              _educationallMap['degree'] = value;
                             },
+                          ),
+                        ),
+                        new ListTile(
+                          leading: const Icon(Icons.local_library),
+                          title: new TextFormField(
+                            decoration: new InputDecoration(
+                              hintText: "Field of Study",
+                            ),
+                            validator: (String value) {
+                              if (value.isEmpty ||
+                                  RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
+                                      .hasMatch(value)) {
+                                return 'Please fill valid Field of Study';
+                              }
+                            },
+                            onSaved: (String value) {
+                              _educationallMap['field'] = value;
+                            },
+                          ),
+                        ),
+                        Divider(),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                          child: Row(
+                            children: <Widget>[
+                              SizedBox(
+                                width: 18.0,
+                              ),
+                              Icon(
+                                Icons.today,
+                                color: Colors.grey,
+                              ),
+                              SizedBox(
+                                width: 25.0,
+                              ),
+                              Container(
+                                width: 90.0,
+                                child: TextFormField(
+                                  decoration: new InputDecoration(
+                                    hintText: "Start Year",
+                                  ),
+                                  validator: (String value) {
+                                    if (value.isEmpty ||
+                                        value.length > 4 ||
+                                        value.length < 4 ||
+                                        !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
+                                            .hasMatch(value) ||
+                                        !(int.parse(value) >= 1980) ||
+                                        !(int.parse(value) <= 2022)) {
+                                      return 'Not valid Year';
+                                    }
+                                  },
+                                  onSaved: (String value) {
+                                    _educationallMap['startyear'] = value;
+                                  },
+                                ),
+                              ),
+                              SizedBox(
+                                width: 40.0,
+                              ),
+                              Container(
+                                width: 90.0,
+                                child: TextFormField(
+                                  decoration: new InputDecoration(
+                                    hintText: "End Year",
+                                  ),
+                                  validator: (String value) {
+                                    if (value.isEmpty ||
+                                        value.length > 4 ||
+                                        !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
+                                            .hasMatch(value) ||
+                                        value.length < 4 ||
+                                        !(int.parse(value) >= 1980) ||
+                                        !(int.parse(value) <= 2022)) {
+                                      return 'Not valid Year';
+                                    }
+                                  },
+                                  onSaved: (String value) {
+                                    _educationallMap['endyear'] = value;
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Divider(),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: new ListTile(
+                            leading: const Icon(Icons.library_books),
+                            title: new TextFormField(
+                              maxLines: 3,
+                              decoration: new InputDecoration(
+                                enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Colors.grey,
+                                      width: 1.0,
+                                      style: BorderStyle.solid,
+                                    ),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(5.0))),
+                                focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Colors.blue,
+                                      width: 1.0,
+                                      style: BorderStyle.solid,
+                                    ),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(5.0))),
+                                hintText: "Description",
+                              ),
+                              validator: (String value) {
+                                if (value.isEmpty ||
+                                    RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
+                                        .hasMatch(value)) {
+                                  return 'Please enter valid Description';
+                                }
+                              },
+                              onSaved: (String value) {
+                                _educationallMap['description'] = value;
+                              },
+                            ),
                           ),
                         ),
                       ],
                     ),
-                  ),
-                  Divider(),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: new ListTile(
-                      leading: const Icon(Icons.library_books),
-                      title: new TextFormField(
-                        maxLines: 3,
-                        decoration: new InputDecoration(
-                          enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.grey,
-                                width: 1.0,
-                                style: BorderStyle.solid,
-                              ),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(5.0))),
-                          focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.blue,
-                                width: 1.0,
-                                style: BorderStyle.solid,
-                              ),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(5.0))),
-                          hintText: "Description",
-                        ),
-                        validator: (String value) {
-                          if(value.isEmpty){return 'Please enter your Description';}
-
-                        },
-
-                        onSaved: (String value) {
-                          _educationallMap['description'] = value;
-                        },
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ));
+                  ],
+                ),
+              ));
   }
 }

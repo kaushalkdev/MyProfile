@@ -20,7 +20,7 @@ class UpdatePersonalDetails extends StatefulWidget {
 
 class _UpdatePersonalDetailsState extends State<UpdatePersonalDetails> {
   String userId = '';
-
+  bool onpress;
   String name = '';
   String email = '';
   String birthday = '';
@@ -72,10 +72,22 @@ class _UpdatePersonalDetailsState extends State<UpdatePersonalDetails> {
     }
   }
 
+
+  Widget progress(bool visibility) {
+    return Visibility(
+        child: Center(
+          child: CircularProgressIndicator(
+            valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF26D2DC)),
+          ),
+        ),
+        visible: visibility);
+  }
+
   @override
   void initState() {
     super.initState();
 
+    onpress = false;
     this.name = widget.name;
     this.email = widget.email;
     this.gender = widget.gender;
@@ -115,12 +127,16 @@ class _UpdatePersonalDetailsState extends State<UpdatePersonalDetails> {
                   _formKey.currentState.save();
 
                   updateDatabase(userId, _personalMap);
+                  setState(() {
+                    onpress = true;
+
+                  });
                 }
               },
             ),
           ],
         ),
-        body: Form(
+        body:(onpress == true)?progress(true): Form(
           key: _formKey,
           child: ListView(
             children: <Widget>[

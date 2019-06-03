@@ -44,6 +44,9 @@ class _UpdateProfessionalDetailsState extends State<UpdateProfessionalDetails> {
   String location = '';
   String documentref = '';
 
+
+  var onpress;
+
   String userid = '';
   final Map<String, dynamic> _professionalMap = {
     'company': null,
@@ -78,8 +81,13 @@ class _UpdateProfessionalDetailsState extends State<UpdateProfessionalDetails> {
             decoration: InputDecoration(hintText: 'End Year'),
             initialValue: endyear,
             validator: (String value) {
-              if (value.isEmpty) {
-                return 'Please fill End year';
+              if (value.isEmpty ||
+                  value.length > 4 ||
+                  value.length < 4 ||
+                  !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$').hasMatch(value) ||
+                  !(int.parse(value) >= 1980) ||
+                  !(int.parse(value) <= 2022)) {
+                return 'Not valid Year';
               }
             },
             onSaved: (String value) {
@@ -96,8 +104,13 @@ class _UpdateProfessionalDetailsState extends State<UpdateProfessionalDetails> {
             decoration: InputDecoration(hintText: 'End Month'),
             initialValue: endmonth,
             validator: (String value) {
-              if (value.isEmpty) {
-                return 'Please fill End month';
+              if (value.isEmpty ||
+                  value.length > 3 ||
+                  value.length < 3 ||
+                  RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
+                      .hasMatch(value) ||
+                  !checkMonth(value)) {
+                return 'Not valid Month';
               }
             },
             onSaved: (String value) {
@@ -133,6 +146,8 @@ class _UpdateProfessionalDetailsState extends State<UpdateProfessionalDetails> {
     if (endyear == 'present') {
       val = true;
     }
+
+    onpress = false;
   }
 
   Future updateDatabase(String userId, Map<String, dynamic> personalMap) async {
@@ -143,16 +158,47 @@ class _UpdateProfessionalDetailsState extends State<UpdateProfessionalDetails> {
         .document(documentref)
         .setData(personalMap)
         .whenComplete(() {
+          progress(false);
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
               builder: (BuildContext context) => ProfessionalDetails()));
     });
   }
+  bool checkMonth(String value) {
 
+    if (value == 'Jan' || value == 'jan') {
+      return true;
+    } else if (value == 'Feb' || value == 'feb') {
+      return true;
+    } else if (value == 'Mar' || value == 'mar') {
+      return true;
+    } else if (value == 'Apr' || value == 'apr') {
+      return true;
+    } else if (value == 'May' || value == 'may') {
+      return true;
+    } else if (value == 'Jun' || value == 'jun') {
+      return true;
+    } else if (value == 'Jul' || value == 'jul') {
+      return true;
+    } else if (value == 'Aug' || value == 'aug') {
+      return true;
+    } else if (value == 'Sep' || value == 'sep') {
+      return true;
+    } else if (value == 'Oct' || value == 'oct') {
+      return true;
+    } else if (value == 'Nov' || value == 'nov') {
+      return true;
+    } else if (value == 'Dec' || value == 'dec') {
+      return true;
+    }
+    return false;
+
+  }
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
+
     return Scaffold(
         appBar: AppBar(
           title: Text('Professional'),
@@ -168,12 +214,15 @@ class _UpdateProfessionalDetailsState extends State<UpdateProfessionalDetails> {
                   _formKey.currentState.save();
 
                   updateDatabase(userid, _professionalMap);
+                  setState(() {
+                    onpress = true;
+                  });
                 }
               },
             ),
           ],
         ),
-        body: Form(
+        body:  (onpress == true)?  progress(true):  Form(
           key: _formKey,
           child: ListView(
             children: <Widget>[
@@ -190,8 +239,10 @@ class _UpdateProfessionalDetailsState extends State<UpdateProfessionalDetails> {
                       ),
                       initialValue: company,
                       validator: (String value) {
-                        if (value.isEmpty) {
-                          return 'Please fill the Company Name';
+                        if (value.isEmpty ||
+                            RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
+                                .hasMatch(value)) {
+                          return 'Please fill the valid Company Name';
                         }
                       },
                       onSaved: (String value) {
@@ -207,8 +258,10 @@ class _UpdateProfessionalDetailsState extends State<UpdateProfessionalDetails> {
                       ),
                       initialValue: designation,
                       validator: (String value) {
-                        if (value.isEmpty) {
-                          return 'Please fill Designation';
+                        if (value.isEmpty ||
+                            RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
+                                .hasMatch(value)) {
+                          return 'Please fill valid Designation';
                         }
                       },
                       onSaved: (String value) {
@@ -267,8 +320,14 @@ class _UpdateProfessionalDetailsState extends State<UpdateProfessionalDetails> {
                           ),
                           initialValue: startyear,
                           validator: (String value) {
-                            if (value.isEmpty) {
-                              return 'Please fill the Start Year';
+                            if (value.isEmpty ||
+                                value.length > 4 ||
+                                value.length < 4 ||
+                                !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
+                                    .hasMatch(value) ||
+                                !(int.parse(value) >= 1980) ||
+                                !(int.parse(value) <= 2022)) {
+                              return 'Not valid Year';
                             }
                           },
                           onSaved: (String value) {
@@ -287,8 +346,13 @@ class _UpdateProfessionalDetailsState extends State<UpdateProfessionalDetails> {
                           ),
                           initialValue: startmonth,
                           validator: (String value) {
-                            if (value.isEmpty) {
-                              return 'Please fill the Start Month';
+                            if (value.isEmpty ||
+                                value.length > 3 ||
+                                value.length < 3 ||
+                                RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
+                                    .hasMatch(value) ||
+                                !checkMonth(value)) {
+                              return 'Not valid Month';
                             }
                           },
                           onSaved: (String value) {
@@ -314,8 +378,10 @@ class _UpdateProfessionalDetailsState extends State<UpdateProfessionalDetails> {
                       ),
                       initialValue: location,
                       validator: (String value) {
-                        if (value.isEmpty) {
-                          return 'Please fill Location';
+                        if (value.isEmpty ||
+                            RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
+                                .hasMatch(value)) {
+                          return 'Please fill valid Location';
                         }
                       },
                       onSaved: (String value) {
@@ -336,7 +402,7 @@ class _UpdateProfessionalDetailsState extends State<UpdateProfessionalDetails> {
                               style: BorderStyle.solid,
                             ),
                             borderRadius:
-                                BorderRadius.all(Radius.circular(5.0))),
+                            BorderRadius.all(Radius.circular(5.0))),
                         focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
                               color: Colors.blue,
@@ -344,13 +410,15 @@ class _UpdateProfessionalDetailsState extends State<UpdateProfessionalDetails> {
                               style: BorderStyle.solid,
                             ),
                             borderRadius:
-                                BorderRadius.all(Radius.circular(5.0))),
+                            BorderRadius.all(Radius.circular(5.0))),
                         hintText: "Description",
                       ),
                       initialValue: descriptiom,
                       validator: (String value) {
-                        if (value.isEmpty) {
-                          return 'Please enter Description';
+                        if (value.isEmpty ||
+                            RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
+                                .hasMatch(value)) {
+                          return 'Please enter valid Description';
                         }
                       },
                       onSaved: (String value) {
@@ -362,7 +430,12 @@ class _UpdateProfessionalDetailsState extends State<UpdateProfessionalDetails> {
               ),
             ],
           ),
-        ));
+        )
+
+
+
+
+      );
   }
 
   Widget appear(BuildContext context, bool valu) {
@@ -375,4 +448,15 @@ class _UpdateProfessionalDetailsState extends State<UpdateProfessionalDetails> {
       return box(context);
     }
   }
+
+  Widget progress(bool visibility) {
+    return Visibility(
+        child: Center(
+          child: CircularProgressIndicator(
+            valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF26D2DC)),
+          ),
+        ),
+        visible: visibility);
+  }
+
 }

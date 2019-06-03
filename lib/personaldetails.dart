@@ -235,23 +235,6 @@ class _PersonalDetailsState extends State<PersonalDetails> {
         print(" userid " + userId);
       });
     });
-
-    StreamBuilder(
-        stream: Firestore.instance
-            .collection('personal')
-            .document(userId)
-            .snapshots(),
-        builder: (context, snapshot) {
-          var userDocument = snapshot.data;
-          if (!snapshot.hasData) {
-            this.Address = userDocument['address'];
-
-            this.Birthday = userDocument['birthday'];
-
-            this.Email = userDocument['email'];
-          }
-        });
-    Name = 'kaushal';
   }
 
   Widget progress(bool visibility) {
@@ -276,18 +259,6 @@ class _PersonalDetailsState extends State<PersonalDetails> {
           actions: <Widget>[
             IconButton(
                 icon: Icon(
-                  Icons.add,
-                  color: Colors.white,
-                ),
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (BuildContext context) =>
-                              EditPersonalDetails()));
-                }),
-            IconButton(
-                icon: Icon(
                   Icons.edit,
                   color: Colors.white,
                 ),
@@ -310,7 +281,7 @@ class _PersonalDetailsState extends State<PersonalDetails> {
         bottomNavigationBar: BottomAppBar(
           child: _buildButtons(),
         ),
-        body:Column(
+        body: Column(
           children: <Widget>[
             Expanded(
               child: Container(
@@ -325,7 +296,7 @@ class _PersonalDetailsState extends State<PersonalDetails> {
                       if (!snapshot.hasData) {
                         return Center(child: progress(true));
                       }
-                      return         ListView(
+                      return ListView(
                         children: <Widget>[
                           Stack(
                             children: <Widget>[
@@ -366,10 +337,6 @@ class _PersonalDetailsState extends State<PersonalDetails> {
             ),
           ],
         ),
-
-
-
-
       ),
     );
   }

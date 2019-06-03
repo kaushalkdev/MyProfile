@@ -38,6 +38,7 @@ class _UpdateEducationDetailsState extends State<UpdateEducationDetails> {
   String description = '';
   String documentRef = '';
 
+  var onpress;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final Map<String, dynamic> _educationallMap = {
@@ -59,6 +60,9 @@ class _UpdateEducationDetailsState extends State<UpdateEducationDetails> {
       });
     });
 
+
+    onpress = false;
+
     this.institute = widget.institute;
     this.degree = widget.degree;
     this.field = widget.field;
@@ -66,6 +70,16 @@ class _UpdateEducationDetailsState extends State<UpdateEducationDetails> {
     this.endyear = widget.endyear;
     this.description = widget.description;
     this.documentRef = widget.documentRef;
+  }
+
+  Widget progress(bool visibility) {
+    return Visibility(
+        child: Center(
+          child: CircularProgressIndicator(
+            valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF26D2DC)),
+          ),
+        ),
+        visible: visibility);
   }
 
   Future updateDatabase(String userId, Map<String, dynamic> personalMap) async {
@@ -76,6 +90,7 @@ class _UpdateEducationDetailsState extends State<UpdateEducationDetails> {
         .document(documentRef)
         .setData(personalMap)
         .whenComplete(() {
+          progress(false);
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -100,12 +115,16 @@ class _UpdateEducationDetailsState extends State<UpdateEducationDetails> {
                   _formKey.currentState.save();
 
                   updateDatabase(userId, _educationallMap);
+                  setState(() {
+
+                    onpress = true;
+                  });
                 }
               },
             ),
           ],
         ),
-        body: Form(
+        body: (onpress == true)? progress(true):Form(
           key: _formKey,
           child: ListView(
             children: <Widget>[
@@ -122,8 +141,10 @@ class _UpdateEducationDetailsState extends State<UpdateEducationDetails> {
                       ),
                       initialValue: institute,
                       validator: (String value) {
-                        if (value.isEmpty) {
-                          return 'Please fill the Institute/University';
+                        if (value.isEmpty ||
+                            RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
+                                .hasMatch(value)) {
+                          return 'Please fill valid Institute/University';
                         }
                       },
                       onSaved: (String value) {
@@ -139,8 +160,10 @@ class _UpdateEducationDetailsState extends State<UpdateEducationDetails> {
                       ),
                       initialValue: degree,
                       validator: (String value) {
-                        if (value.isEmpty) {
-                          return 'Please fill Degree';
+                        if (value.isEmpty ||
+                            RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
+                                .hasMatch(value)) {
+                          return 'Please fill valid Degree';
                         }
                       },
                       onSaved: (String value) {
@@ -156,8 +179,10 @@ class _UpdateEducationDetailsState extends State<UpdateEducationDetails> {
                       ),
                       initialValue: field,
                       validator: (String value) {
-                        if (value.isEmpty) {
-                          return 'Please fill Field of Study';
+                        if (value.isEmpty ||
+                            RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
+                                .hasMatch(value)) {
+                          return 'Please fill valid Field of Study';
                         }
                       },
                       onSaved: (String value) {
@@ -188,8 +213,14 @@ class _UpdateEducationDetailsState extends State<UpdateEducationDetails> {
                             ),
                             initialValue: startyear,
                             validator: (String value) {
-                              if (value.isEmpty) {
-                                return 'Please fill Start Year';
+                              if (value.isEmpty ||
+                                  value.length > 4 ||
+                                  value.length < 4 ||
+                                  !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
+                                      .hasMatch(value) ||
+                                  !(int.parse(value) >= 1980) ||
+                                  !(int.parse(value) <= 2022)) {
+                                return 'Not valid Year';
                               }
                             },
                             onSaved: (String value) {
@@ -208,8 +239,14 @@ class _UpdateEducationDetailsState extends State<UpdateEducationDetails> {
                             ),
                             initialValue: endyear,
                             validator: (String value) {
-                              if (value.isEmpty) {
-                                return 'Please fill End Year';
+                              if (value.isEmpty ||
+                                  value.length > 4 ||
+                                  !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
+                                      .hasMatch(value) ||
+                                  value.length < 4 ||
+                                  !(int.parse(value) >= 1980) ||
+                                  !(int.parse(value) <= 2022)) {
+                                return 'Not valid Year';
                               }
                             },
                             onSaved: (String value) {
@@ -248,8 +285,10 @@ class _UpdateEducationDetailsState extends State<UpdateEducationDetails> {
                         ),
                         initialValue: description,
                         validator: (String value) {
-                          if (value.isEmpty) {
-                            return 'Please enter your Description';
+                          if (value.isEmpty ||
+                              RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
+                                  .hasMatch(value)) {
+                            return 'Please enter valid Description';
                           }
                         },
                         onSaved: (String value) {
