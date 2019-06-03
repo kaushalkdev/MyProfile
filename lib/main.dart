@@ -78,7 +78,17 @@ class _loginUserState extends State<loginUser> {
           'status': 'Student',
           'lastSeen': DateTime.now()
         }).whenComplete(() {
-          progress(false);
+         _db.collection('personal').document(user.uid).setData({
+
+           'name':user.displayName,
+           'email':user.email,
+           'gender':'Enter your Gender',
+           'birthday':'Enter your Birthday',
+           'address':'Enter your current Address',
+
+         }).whenComplete((){
+           progress(false);
+         });
         });
       }
     });
