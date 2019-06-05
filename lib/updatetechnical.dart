@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'technicaldetails.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'auth.dart';
+import 'package:connectivity/connectivity.dart';
 
 class UpdateTechnicalForm extends StatefulWidget {
   String institute = '';
@@ -102,6 +103,7 @@ class _UpdateTechnicalFormState extends State<UpdateTechnicalForm> {
     _dateEnd = enddate;
     _technicalMap['startdate'] = _dateStart;
     _technicalMap['enddate'] = _dateEnd;
+    checkConnectivity();
     widget.authService.getCurrentuser().then((userid) {
       setState(() {
         this.userid = userid;
@@ -109,6 +111,34 @@ class _UpdateTechnicalFormState extends State<UpdateTechnicalForm> {
     });
   }
 
+  checkConnectivity() async {
+    var result = await Connectivity().checkConnectivity();
+    if (result == ConnectivityResult.none) {
+      showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return WillPopScope(
+              onWillPop: () async => false,
+              child: AlertDialog(
+                title: Text('Oops! Internet lost'),
+                content: Text(
+                    'Sorry, Please ckeck your internet connection and then try again'),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text('OK'),
+                    onPressed: () {
+                      checkConnectivity();
+                      Navigator.pop(context);
+                    },
+                  )
+                ],
+              ),
+            );
+          });
+    } else if (result == ConnectivityResult.mobile) {
+    } else if (result == ConnectivityResult.wifi) {}
+  }
   Future updateDatabase(String userId, Map<String, dynamic> personalMap) async {
     Firestore.instance
         .collection('users')
@@ -118,6 +148,7 @@ class _UpdateTechnicalFormState extends State<UpdateTechnicalForm> {
         .setData(personalMap)
         .whenComplete(() {
       progress(false);
+      Navigator.pop(context);
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -150,7 +181,7 @@ class _UpdateTechnicalFormState extends State<UpdateTechnicalForm> {
                 return;
               } else {
                 _formKey.currentState.save();
-
+                checkConnectivity();
                 updateDatabase(userid, _technicalMap);
                 setState(() {
                   onpress = true;
@@ -172,15 +203,6 @@ class _UpdateTechnicalFormState extends State<UpdateTechnicalForm> {
                       SizedBox(
                         height: 5.0,
                       ),
-                      Text(
-                        'Project Details',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15.0),
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(
-                        height: 5.0,
-                      ),
                       new ListTile(
                         leading: const Icon(Icons.account_balance),
                         title: new TextFormField(
@@ -189,8 +211,10 @@ class _UpdateTechnicalFormState extends State<UpdateTechnicalForm> {
                             hintText: "Institute/Company",
                           ),
                           validator: (String value) {
-                            if (value.isEmpty) {
-                              return 'Please fill the Institute/Company Name';
+                            if (value.isEmpty ||
+                                RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
+                                    .hasMatch(value)) {
+                              return 'Please fill the valid Institute/Company Name';
                             }
                           },
                           onSaved: (String value) {
@@ -207,8 +231,10 @@ class _UpdateTechnicalFormState extends State<UpdateTechnicalForm> {
                             hintText: "Project Name",
                           ),
                           validator: (String value) {
-                            if (value.isEmpty) {
-                              return 'Please fill Project Name';
+                            if (value.isEmpty ||
+                                RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
+                                    .hasMatch(value)) {
+                              return 'Please fill the valid Project Name';
                             }
                           },
                           onSaved: (String value) {
@@ -268,96 +294,18 @@ class _UpdateTechnicalFormState extends State<UpdateTechnicalForm> {
                                 ),
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(5.0))),
-                            hintText: "Description",
+                            hintText: "Describe your Project and Skills",
                           ),
                           initialValue: descriptiom,
                           validator: (String value) {
-                            if (value.isEmpty) {
-                              return 'Please enter Description';
+                            if (value.isEmpty ||
+                                RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
+                                    .hasMatch(value)) {
+                              return 'Please fill the valid Description';
                             }
                           },
                           onSaved: (String value) {
                             _technicalMap['description'] = value;
-                          },
-                        ),
-                      ),
-                      Divider(
-                        color: Color(0xFF26D2DC),
-                      ),
-                      SizedBox(
-                        height: 5.0,
-                      ),
-                      Text(
-                        'Add your Skills',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15.0),
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(
-                        height: 5.0,
-                      ),
-                      new ListTile(
-                        title: Container(
-                          width: 90.0,
-                          child: new TextFormField(
-                            maxLines: 3,
-                            decoration: new InputDecoration(
-                              enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Colors.grey,
-                                    width: 1.0,
-                                    style: BorderStyle.solid,
-                                  ),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(5.0))),
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Colors.blue,
-                                    width: 1.0,
-                                    style: BorderStyle.solid,
-                                  ),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(5.0))),
-                              hintText: "Skills",
-                            ),
-                          ),
-                        ),
-                        trailing: FlatButton(
-                          child: Text(
-                            'Add +',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          color: Color(0xFF26D2DC),
-                          onPressed: () {
-                            showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                    title: Text('Skills'),
-                                    content: TextField(
-                                        decoration: InputDecoration(
-                                      hintText: 'Add Skills',
-                                      enabledBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(
-                                              color: Color(0xFF26D2DC))),
-                                      focusedBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(
-                                              color: Color(0xFF26D2DC))),
-                                    )),
-                                    actions: <Widget>[
-                                      FlatButton(
-                                        child: Text(
-                                          'Add',
-                                          style: TextStyle(
-                                              color: Color(0xFF26D2DC)),
-                                        ),
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                      )
-                                    ],
-                                  );
-                                });
                           },
                         ),
                       ),

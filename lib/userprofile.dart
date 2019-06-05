@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart' show timeDilation;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,7 +8,9 @@ import 'educationdetails.dart';
 import 'technicaldetails.dart';
 import 'personaldetails.dart';
 import 'modal.dart';
+import 'package:connectivity/connectivity.dart';
 import 'auth.dart';
+import 'welcomescreen.dart';
 import 'dart:io';
 
 class userProfile extends StatefulWidget {
@@ -31,12 +34,57 @@ class _userProfileState extends State<userProfile> {
 
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
+  bool _visibility = true;
+
+  bool _visibleProfile = false;
+
+  Widget progress(bool visibility) {
+    return Visibility(
+        child: CircularProgressIndicator(
+          valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF26D2DC)),
+        ),
+        visible: visibility);
+  }
+
+  checkConnectivity() async {
+    var result = await Connectivity().checkConnectivity();
+    if (result == ConnectivityResult.none) {
+      showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return WillPopScope(
+              onWillPop: () async => false,
+              child: AlertDialog(
+                title: Text('Oops! Internet lost'),
+                content: Text(
+                    'Sorry, Please ckeck your internet connection and then try again'),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text('OK'),
+                    onPressed: () {
+                      checkConnectivity();
+                      Navigator.pop(context);
+//                      Navigator.pushReplacement(
+//                          context,
+//                          MaterialPageRoute(
+//                              builder: (context) => WelcomeScreen()));
+                    },
+                  )
+                ],
+              ),
+            );
+          });
+    } else if (result == ConnectivityResult.mobile) {
+    } else if (result == ConnectivityResult.wifi) {}
+  }
+
   Widget _buildCoverImage(Size screenSize) {
     return Container(
       height: screenSize.height / 2.6,
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: AssetImage('assets/profileApp.png'),
+          image: AssetImage('assets/professional.jpeg'),
           fit: BoxFit.cover,
         ),
       ),
@@ -106,21 +154,27 @@ class _userProfileState extends State<userProfile> {
             var userDocument = snapshot.data;
 
             if (userDocument != null) {
-              return Container(
-                width: 140.0,
-                height: 140.0,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  image: DecorationImage(
-                    image: NetworkImage(userDocument['photoURL']),
-                    fit: BoxFit.cover,
+              return Stack(
+                children: <Widget>[
+                  Container(
+                    child: progress(_visibility),
+                    alignment: Alignment(0, 0),
+                    width: 140.0,
+                    height: 140.0,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      image: DecorationImage(
+                        image: NetworkImage(userDocument['photoURL']),
+                        fit: BoxFit.cover,
+                      ),
+                      borderRadius: BorderRadius.circular(80.0),
+                      border: Border.all(
+                        color: Colors.white,
+                        width: 5.0,
+                      ),
+                    ),
                   ),
-                  borderRadius: BorderRadius.circular(80.0),
-                  border: Border.all(
-                    color: Colors.white,
-                    width: 5.0,
-                  ),
-                ),
+                ],
               );
             } else {
               return new Container(
@@ -267,11 +321,19 @@ class _userProfileState extends State<userProfile> {
   @override
   void initState() {
     super.initState();
+    timeDilation = 2.0;
 
     widget.authService.getCurrentuser().then((userId) {
       setState(() {
         this.userid = userId;
         print(" userid " + userid);
+      });
+    });
+    Future.delayed(Duration(seconds: 5), () {
+      checkConnectivity();
+      setState(() {
+        _visibility = false;
+        _visibleProfile = true;
       });
     });
   }
@@ -284,42 +346,51 @@ class _userProfileState extends State<userProfile> {
       bottomNavigationBar: BottomAppBar(
         child: _buildButtons(),
       ),
-      body: ListView(
+      body: Stack(
         children: <Widget>[
-          Stack(
+          ListView(
             children: <Widget>[
-              _buildCoverImage(screenSize),
-              Column(
-                children: <Widget>[
-                  SizedBox(height: screenSize.height / 5.1),
-                  _buildProfileImage(),
-                  _buildFullName(),
-                  _buildStatus(context),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  Builder(
-                    builder: (BuildContext context) {
-                      return _buildStatContainer(context, userid);
-                    },
-                  ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  _buildBio(context, userid),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 60.0, right: 60.0),
-                    child: Divider(
-                      color: Colors.blueGrey,
+              Visibility(
+                visible: _visibleProfile,
+                child: Stack(
+                  children: <Widget>[
+                    _buildCoverImage(screenSize),
+                    Column(
+                      children: <Widget>[
+                        SizedBox(height: screenSize.height / 5.1),
+                        _buildProfileImage(),
+                        _buildFullName(),
+                        _buildStatus(context),
+                        SizedBox(
+                          height: 15,
+                        ),
+                        Builder(
+                          builder: (BuildContext context) {
+                            return _buildStatContainer(context, userid);
+                          },
+                        ),
+                        SizedBox(
+                          height: 15,
+                        ),
+                        _buildBio(context, userid),
+                        Padding(
+                          padding:
+                              const EdgeInsets.only(left: 60.0, right: 60.0),
+                          child: Divider(
+                            color: Colors.blueGrey,
+                          ),
+                        ),
+                        //_buildSeparator(screenSize),
+                        SizedBox(height: 10.0),
+                        SizedBox(height: 8.0),
+                      ],
                     ),
-                  ),
-                  //_buildSeparator(screenSize),
-                  SizedBox(height: 10.0),
-                  SizedBox(height: 8.0),
-                ],
+                  ],
+                ),
               ),
             ],
           ),
+          Container(alignment: Alignment(0, 0), child: progress(_visibility)),
         ],
       ),
     );

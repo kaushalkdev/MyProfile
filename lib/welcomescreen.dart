@@ -1,4 +1,6 @@
+import 'package:flutter/scheduler.dart' show timeDilation;
 import 'package:flutter/material.dart';
+import 'package:connectivity/connectivity.dart';
 import 'main.dart';
 import 'dart:async';
 
@@ -18,14 +20,47 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         visible: visibility);
   }
 
+  checkConnectivity() async {
+    var result = await Connectivity().checkConnectivity();
+    if (result == ConnectivityResult.none) {
+      showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return WillPopScope(
+              onWillPop:()async=> false ,
+              child: AlertDialog(
+                title: Text('Oops! Internet lost'),
+                content: Text(
+                    'Sorry, Please ckeck your internet connection and then try again'),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text('OK'),
+                    onPressed: () {
+                     checkConnectivity();
+                     Navigator.pop(context);
+                    },
+                  )
+                ],
+              ),
+            );
+          });
+    } else if (result == ConnectivityResult.mobile) {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => loginUser()));
+    } else if (result == ConnectivityResult.wifi) {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => loginUser()));
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     Future.delayed(Duration(seconds: 5), () {
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => loginUser()));
+      checkConnectivity();
     });
-
+    timeDilation = 2.0;
     Future.delayed(Duration(seconds: 3), () {
       setState(() {
         _visibility = true;
@@ -46,7 +81,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 60.0),
                   child: Image.asset(
-                    'assets/profileApp.png',
+                    'assets/professional.jpeg',
                     width: 350,
                     height: 350,
                   ),

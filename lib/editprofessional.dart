@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'professionaldetails.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'auth.dart';
+import 'package:connectivity/connectivity.dart';
 
 class ProfessionalForm extends StatefulWidget {
   AuthService authService = new AuthService();
@@ -45,9 +46,11 @@ class _ProfessionalFormState extends State<ProfessionalForm> {
           width: 25.0,
         ),
         Container(
-          width: 90.0,
+          width: 100.0,
           child: TextFormField(
             decoration: InputDecoration(hintText: 'End Year'),
+            keyboardType: TextInputType.number,
+            maxLength: 4,
             validator: (String value) {
               if (value.isEmpty ||
                   value.length > 4 ||
@@ -55,12 +58,12 @@ class _ProfessionalFormState extends State<ProfessionalForm> {
                   !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$').hasMatch(value) ||
                   !(int.parse(value) >= 1980) ||
                   !(int.parse(value) <= 2022)) {
-                return 'Not valid Year';
+                return 'Invalid Year';
               }
             },
-            onSaved: (String value){
+            onSaved: (String value) {
               _professionalMap['endyear'] = value;
-          } ,
+            },
           ),
         ),
         SizedBox(
@@ -70,18 +73,18 @@ class _ProfessionalFormState extends State<ProfessionalForm> {
           width: 90.0,
           child: TextFormField(
             decoration: InputDecoration(hintText: 'End Month'),
+            maxLength: 3,
             validator: (String value) {
               if (value.isEmpty ||
                   value.length > 3 ||
                   value.length < 3 ||
-                  RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
-                      .hasMatch(value) ||
-                  !checkMonth(value)) {
+                  RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$').hasMatch(value) ||
+                  !checkMonth(value.toUpperCase())) {
                 return 'Not valid Month';
               }
             },
             onSaved: (String value) {
-              _professionalMap['endmonth'] = value;
+              _professionalMap['endmonth'] = value.toUpperCase();
             },
           ),
         ),
@@ -89,11 +92,40 @@ class _ProfessionalFormState extends State<ProfessionalForm> {
     );
   }
 
+  checkConnectivity() async {
+    var result = await Connectivity().checkConnectivity();
+    if (result == ConnectivityResult.none) {
+      showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return WillPopScope(
+              onWillPop: () async => false,
+              child: AlertDialog(
+                title: Text('Oops! Internet lost'),
+                content: Text(
+                    'Sorry, Please ckeck your internet connection and then try again'),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text('OK'),
+                    onPressed: () {
+                      checkConnectivity();
+                      Navigator.pop(context);
+                    },
+                  )
+                ],
+              ),
+            );
+          });
+    } else if (result == ConnectivityResult.mobile) {
+    } else if (result == ConnectivityResult.wifi) {}
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
+    checkConnectivity();
     widget.authService.getCurrentuser().then((userid) {
       setState(() {
         this.userid = userid;
@@ -121,6 +153,7 @@ class _ProfessionalFormState extends State<ProfessionalForm> {
         .add(personalMap)
         .whenComplete(() {
       progress(false);
+      Navigator.pop(context);
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -144,7 +177,7 @@ class _ProfessionalFormState extends State<ProfessionalForm> {
                   return;
                 } else {
                   _formKey.currentState.save();
-
+                  checkConnectivity();
                   updateDatabase(userid, _professionalMap);
                   setState(() {
                     onpress = true;
@@ -245,8 +278,10 @@ class _ProfessionalFormState extends State<ProfessionalForm> {
                               width: 25.0,
                             ),
                             Container(
-                              width: 90.0,
+                              width: 100.0,
                               child: TextFormField(
+                                keyboardType: TextInputType.number,
+                                maxLength: 4,
                                 decoration: new InputDecoration(
                                   hintText: "Start Year",
                                 ),
@@ -258,7 +293,7 @@ class _ProfessionalFormState extends State<ProfessionalForm> {
                                           .hasMatch(value) ||
                                       !(int.parse(value) >= 1980) ||
                                       !(int.parse(value) <= 2022)) {
-                                    return 'Not valid Year';
+                                    return 'Invalid Year';
                                   }
                                 },
                                 onSaved: (String value) {
@@ -270,23 +305,25 @@ class _ProfessionalFormState extends State<ProfessionalForm> {
                               width: 40.0,
                             ),
                             Container(
-                              width: 90.0,
+                              width: 100.0,
                               child: TextFormField(
                                 decoration: new InputDecoration(
                                   hintText: "Start Month",
                                 ),
+                                maxLength: 3,
                                 validator: (String value) {
                                   if (value.isEmpty ||
                                       value.length > 3 ||
                                       value.length < 3 ||
                                       RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
                                           .hasMatch(value) ||
-                                      !checkMonth(value)) {
-                                    return 'Not valid Month';
+                                      !checkMonth(value.toUpperCase())) {
+                                    return 'Invalid Month';
                                   }
                                 },
                                 onSaved: (String value) {
-                                  _professionalMap['startmonth'] = value;
+                                  _professionalMap['startmonth'] =
+                                      value.toUpperCase();
                                 },
                               ),
                             ),
@@ -374,33 +411,31 @@ class _ProfessionalFormState extends State<ProfessionalForm> {
   }
 
   bool checkMonth(String value) {
-
-    if (value == 'Jan' || value == 'jan') {
+    if (value == 'JAN') {
       return true;
-    } else if (value == 'Feb' || value == 'feb') {
+    } else if (value == 'FEB') {
       return true;
-    } else if (value == 'Mar' || value == 'mar') {
+    } else if (value == 'MAR') {
       return true;
-    } else if (value == 'Apr' || value == 'apr') {
+    } else if (value == 'APR') {
       return true;
-    } else if (value == 'May' || value == 'may') {
+    } else if (value == 'MAY') {
       return true;
-    } else if (value == 'Jun' || value == 'jun') {
+    } else if (value == 'JUN') {
       return true;
-    } else if (value == 'Jul' || value == 'jul') {
+    } else if (value == 'JUL') {
       return true;
-    } else if (value == 'Aug' || value == 'aug') {
+    } else if (value == 'AUG') {
       return true;
-    } else if (value == 'Sep' || value == 'sep') {
+    } else if (value == 'SEP') {
       return true;
-    } else if (value == 'Oct' || value == 'oct') {
+    } else if (value == 'OCT') {
       return true;
-    } else if (value == 'Nov' || value == 'nov') {
+    } else if (value == 'NOV') {
       return true;
-    } else if (value == 'Dec' || value == 'dec') {
+    } else if (value == 'DEC') {
       return true;
     }
     return false;
-
   }
 }

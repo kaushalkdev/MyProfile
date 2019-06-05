@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'professionaldetails.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'auth.dart';
+import 'package:connectivity/connectivity.dart';
 
 class UpdateProfessionalDetails extends StatefulWidget {
   String company = '';
@@ -44,7 +45,6 @@ class _UpdateProfessionalDetailsState extends State<UpdateProfessionalDetails> {
   String location = '';
   String documentref = '';
 
-
   var onpress;
 
   String userid = '';
@@ -76,10 +76,12 @@ class _UpdateProfessionalDetailsState extends State<UpdateProfessionalDetails> {
           width: 25.0,
         ),
         Container(
-          width: 90.0,
+          width: 100.0,
           child: TextFormField(
             decoration: InputDecoration(hintText: 'End Year'),
             initialValue: endyear,
+            maxLength: 4,
+            keyboardType: TextInputType.number,
             validator: (String value) {
               if (value.isEmpty ||
                   value.length > 4 ||
@@ -87,7 +89,7 @@ class _UpdateProfessionalDetailsState extends State<UpdateProfessionalDetails> {
                   !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$').hasMatch(value) ||
                   !(int.parse(value) >= 1980) ||
                   !(int.parse(value) <= 2022)) {
-                return 'Not valid Year';
+                return 'Invalid Year';
               }
             },
             onSaved: (String value) {
@@ -99,22 +101,22 @@ class _UpdateProfessionalDetailsState extends State<UpdateProfessionalDetails> {
           width: 40.0,
         ),
         Container(
-          width: 90.0,
+          width: 100.0,
           child: TextFormField(
             decoration: InputDecoration(hintText: 'End Month'),
             initialValue: endmonth,
+            maxLength: 3,
             validator: (String value) {
               if (value.isEmpty ||
                   value.length > 3 ||
                   value.length < 3 ||
-                  RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
-                      .hasMatch(value) ||
-                  !checkMonth(value)) {
-                return 'Not valid Month';
+                  RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$').hasMatch(value) ||
+                  !checkMonth(value.toUpperCase())) {
+                return 'Invalid Month';
               }
             },
             onSaved: (String value) {
-              _professionalMap['endmonth'] = value;
+              _professionalMap['endmonth'] = value.toUpperCase();
             },
           ),
         ),
@@ -126,7 +128,7 @@ class _UpdateProfessionalDetailsState extends State<UpdateProfessionalDetails> {
   void initState() {
     // TODO: implement initState
     super.initState();
-
+    checkConnectivity();
     widget.authService.getCurrentuser().then((userid) {
       setState(() {
         this.userid = userid;
@@ -150,6 +152,35 @@ class _UpdateProfessionalDetailsState extends State<UpdateProfessionalDetails> {
     onpress = false;
   }
 
+  checkConnectivity() async {
+    var result = await Connectivity().checkConnectivity();
+    if (result == ConnectivityResult.none) {
+      showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return WillPopScope(
+              onWillPop: () async => false,
+              child: AlertDialog(
+                title: Text('Oops! Internet lost'),
+                content: Text(
+                    'Sorry, Please ckeck your internet connection and then try again'),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text('OK'),
+                    onPressed: () {
+                      checkConnectivity();
+                      Navigator.pop(context);
+                    },
+                  )
+                ],
+              ),
+            );
+          });
+    } else if (result == ConnectivityResult.mobile) {
+    } else if (result == ConnectivityResult.wifi) {}
+  }
+
   Future updateDatabase(String userId, Map<String, dynamic> personalMap) async {
     Firestore.instance
         .collection('users')
@@ -158,43 +189,44 @@ class _UpdateProfessionalDetailsState extends State<UpdateProfessionalDetails> {
         .document(documentref)
         .setData(personalMap)
         .whenComplete(() {
-          progress(false);
+      progress(false);
+      Navigator.pop(context);
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
               builder: (BuildContext context) => ProfessionalDetails()));
     });
   }
-  bool checkMonth(String value) {
 
-    if (value == 'Jan' || value == 'jan') {
+  bool checkMonth(String value) {
+    if (value == 'JAN') {
       return true;
-    } else if (value == 'Feb' || value == 'feb') {
+    } else if (value == 'FEB') {
       return true;
-    } else if (value == 'Mar' || value == 'mar') {
+    } else if (value == 'MAR') {
       return true;
-    } else if (value == 'Apr' || value == 'apr') {
+    } else if (value == 'APR') {
       return true;
-    } else if (value == 'May' || value == 'may') {
+    } else if (value == 'MAY') {
       return true;
-    } else if (value == 'Jun' || value == 'jun') {
+    } else if (value == 'JUN') {
       return true;
-    } else if (value == 'Jul' || value == 'jul') {
+    } else if (value == 'JUL') {
       return true;
-    } else if (value == 'Aug' || value == 'aug') {
+    } else if (value == 'AUG') {
       return true;
-    } else if (value == 'Sep' || value == 'sep') {
+    } else if (value == 'SEP') {
       return true;
-    } else if (value == 'Oct' || value == 'oct') {
+    } else if (value == 'OCT') {
       return true;
-    } else if (value == 'Nov' || value == 'nov') {
+    } else if (value == 'NOV') {
       return true;
-    } else if (value == 'Dec' || value == 'dec') {
+    } else if (value == 'DEC') {
       return true;
     }
     return false;
-
   }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -212,7 +244,7 @@ class _UpdateProfessionalDetailsState extends State<UpdateProfessionalDetails> {
                   return;
                 } else {
                   _formKey.currentState.save();
-
+                  checkConnectivity();
                   updateDatabase(userid, _professionalMap);
                   setState(() {
                     onpress = true;
@@ -222,220 +254,221 @@ class _UpdateProfessionalDetailsState extends State<UpdateProfessionalDetails> {
             ),
           ],
         ),
-        body:  (onpress == true)?  progress(true):  Form(
-          key: _formKey,
-          child: ListView(
-            children: <Widget>[
-              new Column(
-                children: <Widget>[
-                  SizedBox(
-                    height: 5.0,
-                  ),
-                  new ListTile(
-                    leading: const Icon(Icons.account_balance),
-                    title: new TextFormField(
-                      decoration: new InputDecoration(
-                        hintText: "Company",
-                      ),
-                      initialValue: company,
-                      validator: (String value) {
-                        if (value.isEmpty ||
-                            RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
-                                .hasMatch(value)) {
-                          return 'Please fill the valid Company Name';
-                        }
-                      },
-                      onSaved: (String value) {
-                        _professionalMap['company'] = value;
-                      },
-                    ),
-                  ),
-                  new ListTile(
-                    leading: const Icon(Icons.face),
-                    title: new TextFormField(
-                      decoration: new InputDecoration(
-                        hintText: "Designation",
-                      ),
-                      initialValue: designation,
-                      validator: (String value) {
-                        if (value.isEmpty ||
-                            RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
-                                .hasMatch(value)) {
-                          return 'Please fill valid Designation';
-                        }
-                      },
-                      onSaved: (String value) {
-                        _professionalMap['designation'] = value;
-                      },
-                    ),
-                  ),
-                  Divider(
-                    height: 30.0,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: new ListTile(
-                      leading: const Icon(Icons.timer),
-                      title: const Text('Time Period'),
-                      subtitle: Container(
-                        child: Row(
+        body: (onpress == true)
+            ? progress(true)
+            : Form(
+                key: _formKey,
+                child: ListView(
+                  children: <Widget>[
+                    new Column(
+                      children: <Widget>[
+                        SizedBox(
+                          height: 5.0,
+                        ),
+                        new ListTile(
+                          leading: const Icon(Icons.account_balance),
+                          title: new TextFormField(
+                            decoration: new InputDecoration(
+                              hintText: "Company",
+                            ),
+                            initialValue: company,
+                            validator: (String value) {
+                              if (value.isEmpty ||
+                                  RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
+                                      .hasMatch(value)) {
+                                return 'Please fill the valid Company Name';
+                              }
+                            },
+                            onSaved: (String value) {
+                              _professionalMap['company'] = value;
+                            },
+                          ),
+                        ),
+                        new ListTile(
+                          leading: const Icon(Icons.face),
+                          title: new TextFormField(
+                            decoration: new InputDecoration(
+                              hintText: "Designation",
+                            ),
+                            initialValue: designation,
+                            validator: (String value) {
+                              if (value.isEmpty ||
+                                  RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
+                                      .hasMatch(value)) {
+                                return 'Please fill valid Designation';
+                              }
+                            },
+                            onSaved: (String value) {
+                              _professionalMap['designation'] = value;
+                            },
+                          ),
+                        ),
+                        Divider(
+                          height: 30.0,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: new ListTile(
+                            leading: const Icon(Icons.timer),
+                            title: const Text('Time Period'),
+                            subtitle: Container(
+                              child: Row(
+                                children: <Widget>[
+                                  Row(
+                                    children: <Widget>[
+                                      Text('I currently work here'),
+                                      Checkbox(
+                                        activeColor: Color(0xFF26D2DC),
+                                        value: val,
+                                        onChanged: (bool value) {
+                                          setState(() {
+                                            val = value;
+                                          });
+                                        },
+                                      )
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        Divider(),
+                        Row(
                           children: <Widget>[
-                            Row(
-                              children: <Widget>[
-                                Text('I currently work here'),
-                                Checkbox(
-                                  activeColor: Color(0xFF26D2DC),
-                                  value: val,
-                                  onChanged: (bool value) {
-                                    setState(() {
-                                      val = value;
-                                    });
-                                  },
-                                )
-                              ],
+                            SizedBox(
+                              width: 18.0,
+                            ),
+                            Icon(
+                              Icons.date_range,
+                              color: Colors.grey,
+                            ),
+                            SizedBox(
+                              width: 25.0,
+                            ),
+                            Container(
+                              width: 100.0,
+                              child: TextFormField(
+                                decoration: new InputDecoration(
+                                  hintText: "Start Year",
+                                ),
+                                initialValue: startyear,
+                                maxLength: 4,
+                                keyboardType: TextInputType.number,
+                                validator: (String value) {
+                                  if (value.isEmpty ||
+                                      value.length > 4 ||
+                                      value.length < 4 ||
+                                      !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
+                                          .hasMatch(value) ||
+                                      !(int.parse(value) >= 1980) ||
+                                      !(int.parse(value) <= 2022)) {
+                                    return 'Invalid Year';
+                                  }
+                                },
+                                onSaved: (String value) {
+                                  _professionalMap['startyear'] = value;
+                                },
+                              ),
+                            ),
+                            SizedBox(
+                              width: 40.0,
+                            ),
+                            Container(
+                              width: 100.0,
+                              child: TextFormField(
+                                decoration: new InputDecoration(
+                                  hintText: "Start Month",
+                                ),
+                                initialValue: startmonth,
+                                maxLength: 3,
+                                validator: (String value) {
+                                  if (value.isEmpty ||
+                                      value.length > 3 ||
+                                      value.length < 3 ||
+                                      RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
+                                          .hasMatch(value) ||
+                                      !checkMonth(value.toUpperCase())) {
+                                    return 'Invalid Month';
+                                  }
+                                },
+                                onSaved: (String value) {
+                                  _professionalMap['startmonth'] =
+                                      value.toUpperCase();
+                                },
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                    ),
-                  ),
-                  Divider(),
-                  Row(
-                    children: <Widget>[
-                      SizedBox(
-                        width: 18.0,
-                      ),
-                      Icon(
-                        Icons.date_range,
-                        color: Colors.grey,
-                      ),
-                      SizedBox(
-                        width: 25.0,
-                      ),
-                      Container(
-                        width: 90.0,
-                        child: TextFormField(
-                          decoration: new InputDecoration(
-                            hintText: "Start Year",
-                          ),
-                          initialValue: startyear,
-                          validator: (String value) {
-                            if (value.isEmpty ||
-                                value.length > 4 ||
-                                value.length < 4 ||
-                                !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
-                                    .hasMatch(value) ||
-                                !(int.parse(value) >= 1980) ||
-                                !(int.parse(value) <= 2022)) {
-                              return 'Not valid Year';
-                            }
-                          },
-                          onSaved: (String value) {
-                            _professionalMap['startyear'] = value;
-                          },
+                        SizedBox(
+                          height: 10.0,
                         ),
-                      ),
-                      SizedBox(
-                        width: 40.0,
-                      ),
-                      Container(
-                        width: 90.0,
-                        child: TextFormField(
-                          decoration: new InputDecoration(
-                            hintText: "Start Month",
-                          ),
-                          initialValue: startmonth,
-                          validator: (String value) {
-                            if (value.isEmpty ||
-                                value.length > 3 ||
-                                value.length < 3 ||
-                                RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
-                                    .hasMatch(value) ||
-                                !checkMonth(value)) {
-                              return 'Not valid Month';
-                            }
-                          },
-                          onSaved: (String value) {
-                            _professionalMap['startmonth'] = value;
-                          },
+                        appear(context, val),
+                        SizedBox(
+                          height: 10.0,
                         ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 10.0,
-                  ),
-                  appear(context, val),
-                  SizedBox(
-                    height: 10.0,
-                  ),
-                  Divider(),
-                  new ListTile(
-                    leading: const Icon(Icons.location_on),
-                    title: new TextFormField(
-                      decoration: new InputDecoration(
-                        hintText: "Location",
-                      ),
-                      initialValue: location,
-                      validator: (String value) {
-                        if (value.isEmpty ||
-                            RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
-                                .hasMatch(value)) {
-                          return 'Please fill valid Location';
-                        }
-                      },
-                      onSaved: (String value) {
-                        _professionalMap['location'] = value;
-                      },
-                    ),
-                  ),
-                  Divider(),
-                  new ListTile(
-                    leading: const Icon(Icons.library_books),
-                    title: new TextFormField(
-                      maxLines: 3,
-                      decoration: new InputDecoration(
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.grey,
-                              width: 1.0,
-                              style: BorderStyle.solid,
+                        Divider(),
+                        new ListTile(
+                          leading: const Icon(Icons.location_on),
+                          title: new TextFormField(
+                            decoration: new InputDecoration(
+                              hintText: "Location",
                             ),
-                            borderRadius:
-                            BorderRadius.all(Radius.circular(5.0))),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.blue,
-                              width: 1.0,
-                              style: BorderStyle.solid,
+                            initialValue: location,
+                            validator: (String value) {
+                              if (value.isEmpty ||
+                                  RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
+                                      .hasMatch(value)) {
+                                return 'Please fill valid Location';
+                              }
+                            },
+                            onSaved: (String value) {
+                              _professionalMap['location'] = value;
+                            },
+                          ),
+                        ),
+                        Divider(),
+                        new ListTile(
+                          leading: const Icon(Icons.library_books),
+                          title: new TextFormField(
+                            maxLines: 3,
+                            decoration: new InputDecoration(
+                              enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.grey,
+                                    width: 1.0,
+                                    style: BorderStyle.solid,
+                                  ),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(5.0))),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.blue,
+                                    width: 1.0,
+                                    style: BorderStyle.solid,
+                                  ),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(5.0))),
+                              hintText: "Description",
                             ),
-                            borderRadius:
-                            BorderRadius.all(Radius.circular(5.0))),
-                        hintText: "Description",
-                      ),
-                      initialValue: descriptiom,
-                      validator: (String value) {
-                        if (value.isEmpty ||
-                            RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
-                                .hasMatch(value)) {
-                          return 'Please enter valid Description';
-                        }
-                      },
-                      onSaved: (String value) {
-                        _professionalMap['description'] = value;
-                      },
+                            initialValue: descriptiom,
+                            validator: (String value) {
+                              if (value.isEmpty ||
+                                  RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
+                                      .hasMatch(value)) {
+                                return 'Please enter valid Description';
+                              }
+                            },
+                            onSaved: (String value) {
+                              _professionalMap['description'] = value;
+                            },
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        )
-
-
-
-
-      );
+                  ],
+                ),
+              ));
   }
 
   Widget appear(BuildContext context, bool valu) {
@@ -458,5 +491,4 @@ class _UpdateProfessionalDetailsState extends State<UpdateProfessionalDetails> {
         ),
         visible: visibility);
   }
-
 }

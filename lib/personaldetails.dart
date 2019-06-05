@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'technicaldetails.dart';
 import 'auth.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'professionaldetails.dart';
 import 'educationdetails.dart';
-import 'editpersonal.dart';
+import 'package:flutter/scheduler.dart' show timeDilation;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'updatepersonal.dart';
 import 'main.dart';
@@ -85,6 +86,32 @@ class _PersonalDetailsState extends State<PersonalDetails> {
         ],
       ),
     );
+  }
+
+  checkConnectivity() async {
+    var result = await Connectivity().checkConnectivity();
+    if (result == ConnectivityResult.none) {
+      showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Oops! Internet lost'),
+              content: Text(
+                  'Sorry, Please ckeck your internet connection and then try again'),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text('OK'),
+                  onPressed: () {
+                    checkConnectivity();
+                    Navigator.pop(context);
+                  },
+                )
+              ],
+            );
+          });
+    } else if (result == ConnectivityResult.mobile) {
+    } else if (result == ConnectivityResult.wifi) {}
   }
 
   Widget name(BuildContext context, String userid) {
@@ -228,7 +255,8 @@ class _PersonalDetailsState extends State<PersonalDetails> {
   void initState() {
     // TODO: implement initState
     super.initState();
-
+    timeDilation = 2.0;
+    checkConnectivity();
     widget.authService.getCurrentuser().then((userId) {
       setState(() {
         this.userId = userId;
@@ -263,6 +291,7 @@ class _PersonalDetailsState extends State<PersonalDetails> {
                   color: Colors.white,
                 ),
                 onPressed: () {
+                  checkConnectivity();
                   Navigator.push(
                       context,
                       MaterialPageRoute(

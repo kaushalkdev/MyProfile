@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
+import 'welcomescreen.dart';
+import 'package:connectivity/connectivity.dart';
 import 'auth.dart';
 import 'dart:io';
 import 'main.dart';
@@ -13,6 +15,43 @@ class Modal {
   File _image;
 
   String userId;
+
+  checkConnectivity(BuildContext context) async {
+    var result = await Connectivity().checkConnectivity();
+    if (result == ConnectivityResult.none) {
+      showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return WillPopScope(
+              onWillPop: ()async=> false,
+              child: AlertDialog(
+                title: Text('Oops! Internet lost'),
+                content: Text(
+                    'Sorry, Please ckeck your internet connection and then try again'),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text('OK'),
+                    onPressed: () {
+                      checkConnectivity(context);
+                      Navigator.pop(context);
+                      //Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>WelcomeScreen()));
+
+                    },
+                  )
+                ],
+
+
+              ),
+            );
+          });
+    } else if (result == ConnectivityResult.mobile) {
+
+    } else if (result == ConnectivityResult.wifi) {
+
+    }
+  }
+
 
   void openSettings(BuildContext context) {
     showModalBottomSheet(
@@ -25,12 +64,12 @@ class Modal {
               SizedBox(
                 height: 10.0,
               ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
                   child: Row(
                     children: <Widget>[
                       Icon(
@@ -49,17 +88,17 @@ class Modal {
                 ),
               ),
               Divider(),
-              GestureDetector(
-                onTap: () {
-                  authService.signOut();
-                  Navigator.pop(context);
-                  Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (BuildContext context) => loginUser()));
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: GestureDetector(
+                  onTap: () {
+                    authService.signOut();
+                    Navigator.pop(context);
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (BuildContext context) => loginUser()));
+                  },
                   child: Row(
                     children: <Widget>[
                       Icon(Icons.exit_to_app, color: Colors.deepOrange),
@@ -80,7 +119,7 @@ class Modal {
         });
   }
 
-  Widget updateStatus(BuildContext context,String userId) {
+  Widget updateStatus(BuildContext context, String userId) {
     Navigator.pop(context);
     showDialog(
         context: context,
@@ -159,13 +198,14 @@ class Modal {
               SizedBox(
                 height: 10.0,
               ),
-              GestureDetector(
-                onTap: () {
-                  getImage(userId);
-                  Navigator.pop(context);
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: GestureDetector(
+                  onTap: () {
+                    getImage(userId);
+                    checkConnectivity(context);
+                    Navigator.pop(context);
+                  },
                   child: Row(
                     children: <Widget>[
                       Icon(
@@ -184,12 +224,12 @@ class Modal {
                 ),
               ),
               Divider(),
-              GestureDetector(
-                onTap: () {
-                  updateStatus(context,userId);
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: GestureDetector(
+                  onTap: () {
+                    updateStatus(context, userId);
+                  },
                   child: Row(
                     children: <Widget>[
                       Icon(
@@ -208,12 +248,12 @@ class Modal {
                 ),
               ),
               Divider(),
-              GestureDetector(
-                onTap: () {
-                  updateBio(context, userId);
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: GestureDetector(
+                  onTap: () {
+                    updateBio(context, userId);
+                  },
                   child: Row(
                     children: <Widget>[
                       Icon(

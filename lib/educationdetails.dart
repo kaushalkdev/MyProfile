@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart' show timeDilation;
 import 'personaldetails.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'technicaldetails.dart';
@@ -6,7 +7,9 @@ import 'professionaldetails.dart';
 import 'editeducation.dart';
 import 'updateeducational.dart';
 import 'main.dart';
+import 'welcomescreen.dart';
 import 'auth.dart';
+import 'package:connectivity/connectivity.dart';
 
 class EducationalDetails extends StatefulWidget {
   AuthService service = new AuthService();
@@ -81,31 +84,90 @@ class _EducationalDetailsState extends State<EducationalDetails> {
     );
   }
 
+  checkConnectivity() async {
+    var result = await Connectivity().checkConnectivity();
+    if (result == ConnectivityResult.none) {
+      showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return WillPopScope(
+              onWillPop: () async => false,
+              child: AlertDialog(
+                title: Text('Oops! Internet lost'),
+                content: Text(
+                    'Sorry, Please ckeck your internet connection and then try again'),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text('OK'),
+                    onPressed: () {
+                      checkConnectivity();
+                      Navigator.pop(context);
+                      //Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>WelcomeScreen()));
+                    },
+                  )
+                ],
+              ),
+            );
+          });
+    } else if (result == ConnectivityResult.mobile) {
+    } else if (result == ConnectivityResult.wifi) {}
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    timeDilation = 2.0;
     widget.service.getCurrentuser().then((userid) {
       setState(() {
         this.userid = userid;
       });
     });
+    checkConnectivity();
   }
 
   Widget buildListItem(BuildContext context, DocumentSnapshot document) {
     progress(false);
     return Dismissible(
       key: Key(document.documentID),
-      onDismissed: (DismissDirection direction) {
-        direction = DismissDirection.endToStart;
-
-        Firestore.instance
-            .collection('users')
-            .document('education')
-            .collection(userid)
-            .document(document.documentID)
-            .delete();
+      confirmDismiss: (direction) async {
+        final bool res = await showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text("Confirm"),
+                content: const Text("Do you want to delete this item?"),
+                actions: <Widget>[
+                  FlatButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(true);
+                        Firestore.instance
+                            .collection('users')
+                            .document('education')
+                            .collection(userid)
+                            .document(document.documentID)
+                            .delete();
+                      },
+                      child: const Text("DELETE")),
+                  FlatButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: const Text("CANCEL"),
+                  )
+                ],
+              );
+            });
       },
+      background: Container(
+        alignment: Alignment(0.8, 0),
+        color: Color(0xffe8eaed),
+        child: Icon(
+          Icons.delete,
+          color: Colors.grey,
+          size: 35.0,
+        ),
+      ),
+      direction: DismissDirection.endToStart,
       child: Card(
         child: Padding(
           padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
@@ -127,8 +189,8 @@ class _EducationalDetailsState extends State<EducationalDetails> {
                     children: <Widget>[
                       Expanded(
                         child: Text(document['degree'],
-                            style:
-                                TextStyle(fontSize: 16.0, color: Colors.blueGrey)),
+                            style: TextStyle(
+                                fontSize: 16.0, color: Colors.blueGrey)),
                       ),
                     ],
                   ),
@@ -218,9 +280,10 @@ class _EducationalDetailsState extends State<EducationalDetails> {
           child: _buildButtons(),
         ),
         body: Column(
-
           children: <Widget>[
-            SizedBox(height: 10,),
+            SizedBox(
+              height: 10,
+            ),
             Expanded(
               child: Container(
                 width: MediaQuery.of(context).size.width,

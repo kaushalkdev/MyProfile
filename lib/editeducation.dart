@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'auth.dart';
+import 'welcomescreen.dart';
+import 'package:connectivity/connectivity.dart';
 import 'educationdetails.dart';
 
 class EducationForm extends StatefulWidget {
@@ -48,6 +50,36 @@ class _EducationFormState extends State<EducationForm> {
       });
     });
     onpress = false;
+    checkConnectivity();
+  }
+
+  checkConnectivity() async {
+    var result = await Connectivity().checkConnectivity();
+    if (result == ConnectivityResult.none) {
+      showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return WillPopScope(
+              onWillPop: () async => false,
+              child: AlertDialog(
+                title: Text('Oops! Internet lost'),
+                content: Text(
+                    'Sorry, Please ckeck your internet connection and then try again'),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text('OK'),
+                    onPressed: () {
+                      checkConnectivity();
+                      Navigator.pop(context);
+                    },
+                  )
+                ],
+              ),
+            );
+          });
+    } else if (result == ConnectivityResult.mobile) {
+    } else if (result == ConnectivityResult.wifi) {}
   }
 
   Future updateDatabase(String userId, Map<String, dynamic> personalMap) async {
@@ -58,6 +90,7 @@ class _EducationFormState extends State<EducationForm> {
         .add(personalMap)
         .whenComplete(() {
       progress(false);
+      Navigator.pop(context);
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -82,6 +115,7 @@ class _EducationFormState extends State<EducationForm> {
                 } else {
                   _formKey.currentState.save();
 
+                  checkConnectivity();
                   updateDatabase(userId, _educationallMap);
                   setState(() {
                     onpress = true;
@@ -172,11 +206,13 @@ class _EducationFormState extends State<EducationForm> {
                                 width: 25.0,
                               ),
                               Container(
-                                width: 90.0,
+                                width: 100.0,
                                 child: TextFormField(
                                   decoration: new InputDecoration(
                                     hintText: "Start Year",
                                   ),
+                                  maxLength: 4,
+                                  keyboardType: TextInputType.number,
                                   validator: (String value) {
                                     if (value.isEmpty ||
                                         value.length > 4 ||
@@ -185,7 +221,7 @@ class _EducationFormState extends State<EducationForm> {
                                             .hasMatch(value) ||
                                         !(int.parse(value) >= 1980) ||
                                         !(int.parse(value) <= 2022)) {
-                                      return 'Not valid Year';
+                                      return 'Invalid Year';
                                     }
                                   },
                                   onSaved: (String value) {
@@ -197,11 +233,13 @@ class _EducationFormState extends State<EducationForm> {
                                 width: 40.0,
                               ),
                               Container(
-                                width: 90.0,
+                                width: 100.0,
                                 child: TextFormField(
                                   decoration: new InputDecoration(
                                     hintText: "End Year",
                                   ),
+                                  maxLength: 4,
+                                  keyboardType: TextInputType.number,
                                   validator: (String value) {
                                     if (value.isEmpty ||
                                         value.length > 4 ||
@@ -210,7 +248,7 @@ class _EducationFormState extends State<EducationForm> {
                                         value.length < 4 ||
                                         !(int.parse(value) >= 1980) ||
                                         !(int.parse(value) <= 2022)) {
-                                      return 'Not valid Year';
+                                      return 'Invalid Year';
                                     }
                                   },
                                   onSaved: (String value) {

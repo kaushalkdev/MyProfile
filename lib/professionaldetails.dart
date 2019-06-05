@@ -5,7 +5,10 @@ import 'technicaldetails.dart';
 import 'editprofessional.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'auth.dart';
+import 'welcomescreen.dart';
+import 'package:connectivity/connectivity.dart';
 import 'main.dart';
+import 'package:flutter/scheduler.dart' show timeDilation;
 import 'updateprofessional.dart';
 
 class ProfessionalDetails extends StatefulWidget {
@@ -81,20 +84,86 @@ class _ProfessionalDetailsState extends State<ProfessionalDetails> {
     );
   }
 
+  checkConnectivity() async {
+    var result = await Connectivity().checkConnectivity();
+    if (result == ConnectivityResult.none) {
+      showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return WillPopScope(
+              onWillPop: ()async=> false,
+              child: AlertDialog(
+                title: Text('Oops! Internet lost'),
+                content: Text(
+                    'Sorry, Please ckeck your internet connection and then try again'),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text('OK'),
+                    onPressed: () {
+                      checkConnectivity();
+                      Navigator.pop(context);
+                      //Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>WelcomeScreen()));
+
+                    },
+                  )
+                ],
+
+
+              ),
+            );
+          });
+    } else if (result == ConnectivityResult.mobile) {
+
+    } else if (result == ConnectivityResult.wifi) {
+
+    }
+  }
+
+
+
   Widget buildListItem(BuildContext context, DocumentSnapshot document) {
     progress(false);
     return Dismissible(
         key: Key(document.documentID),
-        onDismissed: (DismissDirection direction) {
-          direction = DismissDirection.endToStart;
+        confirmDismiss: (direction) async {
+          final bool res = await showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text("Confirm"),
+                  content: const Text("Do you want to delete this item?"),
+                  actions: <Widget>[
+                    FlatButton(
+                        onPressed: () {
+                          Navigator.of(context).pop(true);
 
-          Firestore.instance
-              .collection('users')
-              .document('professional')
-              .collection(userid)
-              .document(document.documentID)
-              .delete();
+                          Firestore.instance
+                              .collection('users')
+                              .document('professional')
+                              .collection(userid)
+                              .document(document.documentID)
+                              .delete();
+                        },
+                        child: const Text("DELETE")),
+                    FlatButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: const Text("CANCEL"),
+                    )
+                  ],
+                );
+              });
         },
+        background: Container(
+          alignment: Alignment(0.8, 0),
+          color: Color(0xffe8eaed),
+          child: Icon(
+            Icons.delete,
+            color: Colors.grey,
+            size: 35.0,
+          ),
+        ),
+        direction: DismissDirection.endToStart,
         child: Card(
           child: Padding(
             padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
@@ -158,6 +227,7 @@ class _ProfessionalDetailsState extends State<ProfessionalDetails> {
               trailing: IconButton(
                   icon: Icon(Icons.edit),
                   onPressed: () {
+                    checkConnectivity();
                     Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -191,6 +261,8 @@ class _ProfessionalDetailsState extends State<ProfessionalDetails> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    timeDilation = 2.0;
+    checkConnectivity();
     widget.authService.getCurrentuser().then((userid) {
       setState(() {
         this.userid = userid;
@@ -216,6 +288,7 @@ class _ProfessionalDetailsState extends State<ProfessionalDetails> {
                   color: Colors.white,
                 ),
                 onPressed: () {
+                  checkConnectivity();
                   Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -230,7 +303,9 @@ class _ProfessionalDetailsState extends State<ProfessionalDetails> {
         ),
         body: Column(
           children: <Widget>[
-            SizedBox(height: 10,),
+            SizedBox(
+              height: 10,
+            ),
             Expanded(
               child: Container(
                 width: MediaQuery.of(context).size.width,

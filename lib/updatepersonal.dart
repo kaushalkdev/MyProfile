@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'personaldetails.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'auth.dart';
+import 'package:connectivity/connectivity.dart';
 
 class UpdatePersonalDetails extends StatefulWidget {
   AuthService authService = new AuthService();
@@ -59,7 +60,6 @@ class _UpdatePersonalDetailsState extends State<UpdatePersonalDetails> {
         firstDate: DateTime(1980),
         lastDate: DateTime(2022));
 
-
     if (picked != null) {
       setState(() {
         _duedate = picked;
@@ -72,7 +72,6 @@ class _UpdatePersonalDetailsState extends State<UpdatePersonalDetails> {
     }
   }
 
-
   Widget progress(bool visibility) {
     return Visibility(
         child: Center(
@@ -83,10 +82,39 @@ class _UpdatePersonalDetailsState extends State<UpdatePersonalDetails> {
         visible: visibility);
   }
 
+  checkConnectivity() async {
+    var result = await Connectivity().checkConnectivity();
+    if (result == ConnectivityResult.none) {
+      showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return WillPopScope(
+              onWillPop: () async => false,
+              child: AlertDialog(
+                title: Text('Oops! Internet lost'),
+                content: Text(
+                    'Sorry, Please ckeck your internet connection and then try again'),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text('OK'),
+                    onPressed: () {
+                      checkConnectivity();
+                      Navigator.pop(context);
+                    },
+                  )
+                ],
+              ),
+            );
+          });
+    } else if (result == ConnectivityResult.mobile) {
+    } else if (result == ConnectivityResult.wifi) {}
+  }
+
   @override
   void initState() {
     super.initState();
-
+    checkConnectivity();
     onpress = false;
     this.name = widget.name;
     this.email = widget.email;
@@ -112,7 +140,15 @@ class _UpdatePersonalDetailsState extends State<UpdatePersonalDetails> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext context) => PersonalDetails()));
+        return true;
+      },
+      child: Scaffold(
         appBar: AppBar(
           title: Text('Personal'),
           backgroundColor: Color(0xFF26D2DC),
@@ -125,156 +161,165 @@ class _UpdatePersonalDetailsState extends State<UpdatePersonalDetails> {
                   return;
                 } else {
                   _formKey.currentState.save();
-
+                  checkConnectivity();
                   updateDatabase(userId, _personalMap);
                   setState(() {
                     onpress = true;
-
                   });
                 }
               },
             ),
           ],
         ),
-        body:(onpress == true)?progress(true): Form(
-          key: _formKey,
-          child: ListView(
-            children: <Widget>[
-              new Column(
-                children: <Widget>[
-                  SizedBox(
-                    height: 5.0,
-                  ),
-                  new ListTile(
-                    leading: const Icon(Icons.person),
-                    title: new TextFormField(
-                      decoration: new InputDecoration(
-                        hintText: "Name",
-                      ),
-                      initialValue: name,
-                      validator: (String value) {
-                        if (value.isEmpty) {
-                          return 'Please fill the name';
-                        }
-                      },
-                      onSaved: (String value) {
-                        _personalMap['name'] = value;
-                      },
-                    ),
-                  ),
-                  new ListTile(
-                    leading: const Icon(Icons.email),
-                    title: new TextFormField(
-                      decoration: new InputDecoration(
-                        hintText: "Email",
-                      ),
-                      initialValue: email,
-                      validator: (String value) {
-                        if (value.isEmpty) {
-                          return 'Please fill EmailId';
-                        }
-                      },
-                      onSaved: (String value) {
-                        _personalMap['email'] = value;
-                      },
-                    ),
-                  ),
-                  Divider(
-                    height: 30.0,
-                  ),
-                  new ListTile(
-                    leading: const Icon(Icons.today),
-                    title: const Text('Birthday'),
-                    subtitle: Text(_dateText),
-                    trailing: GestureDetector(
-                      onTap: () {
-                        _selectdueDate(context);
-                      },
-                      child: const Icon(
-                        Icons.edit,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ),
-                  Divider(),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: new ListTile(
-                      leading: const Icon(Icons.wc),
-                      title: const Text('Gender'),
-                      subtitle: Container(
-                        child: Row(
-                          children: <Widget>[
-                            Row(
-                              children: <Widget>[
-                                Text('Male'),
-                                Radio(
-                                  onChanged: (int e) {
-                                    action(e);
-                                  },
-                                  activeColor: Colors.blue,
-                                  value: 1,
-                                  groupValue: groupValue,
-                                ),
-                                SizedBox(
-                                  width: 8.0,
-                                ),
-                                Text('Female'),
-                                Radio(
-                                  onChanged: (int e) {
-                                    action(e);
-                                  },
-                                  activeColor: Colors.blue,
-                                  value: 2,
-                                  groupValue: groupValue,
-                                )
-                              ],
-                            ),
-                          ],
+        body: (onpress == true)
+            ? progress(true)
+            : Form(
+                key: _formKey,
+                child: ListView(
+                  children: <Widget>[
+                    new Column(
+                      children: <Widget>[
+                        SizedBox(
+                          height: 5.0,
                         ),
-                      ),
-                    ),
-                  ),
-                  Divider(),
-                  new ListTile(
-                    leading: const Icon(Icons.home),
-                    title: new TextFormField(
-                      maxLines: 3,
-                      decoration: new InputDecoration(
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
+                        new ListTile(
+                          leading: const Icon(Icons.person),
+                          title: new TextFormField(
+                            decoration: new InputDecoration(
+                              hintText: "Name",
+                            ),
+                            initialValue: name,
+                            validator: (String value) {
+                              if (value.isEmpty ||
+                                  RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
+                                      .hasMatch(value)) {
+                                return 'Please fill valid Name';
+                              }
+                            },
+                            onSaved: (String value) {
+                              _personalMap['name'] = value;
+                            },
+                          ),
+                        ),
+                        new ListTile(
+                          leading: const Icon(Icons.email),
+                          title: new TextFormField(
+                            decoration: new InputDecoration(
+                              hintText: "Email",
+                            ),
+                            initialValue: email,
+                            validator: (String value) {
+                              if (value.isEmpty ||
+                                  !RegExp(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
+                                      .hasMatch(value)) {
+                                return 'Please fill a valid EmailId';
+                              }
+                            },
+                            onSaved: (String value) {
+                              _personalMap['email'] = value;
+                            },
+                          ),
+                        ),
+                        Divider(
+                          height: 30.0,
+                        ),
+                        new ListTile(
+                          leading: const Icon(Icons.today),
+                          title: const Text('Birthday'),
+                          subtitle: Text(_dateText),
+                          trailing: GestureDetector(
+                            onTap: () {
+                              _selectdueDate(context);
+                            },
+                            child: const Icon(
+                              Icons.edit,
                               color: Colors.grey,
-                              width: 1.0,
-                              style: BorderStyle.solid,
                             ),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(5.0))),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.blue,
-                              width: 1.0,
-                              style: BorderStyle.solid,
+                          ),
+                        ),
+                        Divider(),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: new ListTile(
+                            leading: const Icon(Icons.wc),
+                            title: const Text('Gender'),
+                            subtitle: Container(
+                              child: Row(
+                                children: <Widget>[
+                                  Row(
+                                    children: <Widget>[
+                                      Text('Male'),
+                                      Radio(
+                                        onChanged: (int e) {
+                                          action(e);
+                                        },
+                                        activeColor: Colors.blue,
+                                        value: 1,
+                                        groupValue: groupValue,
+                                      ),
+                                      SizedBox(
+                                        width: 8.0,
+                                      ),
+                                      Text('Female'),
+                                      Radio(
+                                        onChanged: (int e) {
+                                          action(e);
+                                        },
+                                        activeColor: Colors.blue,
+                                        value: 2,
+                                        groupValue: groupValue,
+                                      )
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(5.0))),
-                        hintText: "Address",
-                      ),
-                      initialValue: address,
-                      validator: (String value) {
-                        if (value.isEmpty) {
-                          return 'Please enter the address';
-                        }
-                      },
-                      onSaved: (String value) {
-                        _personalMap['address'] = value;
-                      },
+                          ),
+                        ),
+                        Divider(),
+                        new ListTile(
+                          leading: const Icon(Icons.home),
+                          title: new TextFormField(
+                            maxLines: 3,
+                            decoration: new InputDecoration(
+                              enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.grey,
+                                    width: 1.0,
+                                    style: BorderStyle.solid,
+                                  ),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(5.0))),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.blue,
+                                    width: 1.0,
+                                    style: BorderStyle.solid,
+                                  ),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(5.0))),
+                              hintText: "Address",
+                            ),
+                            initialValue: address,
+                            validator: (String value) {
+                              if (value.isEmpty ||
+                                  RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
+                                      .hasMatch(value)) {
+                                return 'Please fill valid Address';
+                              }
+                            },
+                            onSaved: (String value) {
+                              _personalMap['address'] = value;
+                            },
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ],
-          ),
-        ));
+      ),
+    );
   }
 
   Future updateDatabase(String userId, Map<String, dynamic> personalMap) async {
@@ -283,6 +328,8 @@ class _UpdatePersonalDetailsState extends State<UpdatePersonalDetails> {
         .document(userId)
         .setData(personalMap)
         .whenComplete(() {
+      progress(false);
+      Navigator.pop(context);
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(

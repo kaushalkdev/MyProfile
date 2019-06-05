@@ -33,12 +33,21 @@ dependencies:
   flutter_screenutil:
   flutter_auth_buttons:
   shared_preferences:
+  connectivity:
 
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+  flutter_launcher_icons: "^0.7.0"
+
+flutter_icons:
+  ios: true
+  android: true
+  image_path_android: "assets/books.png"
+  image_path_ios: "assets/books.png"
 
 
 # For information on the generic Dart part of this file, see the
@@ -58,6 +67,7 @@ flutter:
     - assets/googleimage.jpg
     - assets/profileApp.png
     - assets/defaultimage.png
+    - assets/professional.jpeg
 
   #  - images/a_dot_ham.jpeg
 
