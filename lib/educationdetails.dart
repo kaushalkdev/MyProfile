@@ -168,73 +168,78 @@ class _EducationalDetailsState extends State<EducationalDetails> {
         ),
       ),
       direction: DismissDirection.endToStart,
-      child: Padding(
-        padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-        child: ListTile(
-          leading: Icon(
-            Icons.account_balance,
-            size: 30.0,
-          ),
-          title: Text(document['institute'],
-              style: TextStyle(
-                  fontSize: 18.0,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold)),
-          subtitle: Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Container(
-              child: Column(children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(document['degree'],
-                          style: TextStyle(
-                              fontSize: 16.0, color: Colors.blueGrey)),
+      child: Column(
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
+            child: ListTile(
+              leading: Icon(
+                Icons.account_balance,
+                size: 30.0,
+              ),
+              title: Text(document['institute'],
+                  style: TextStyle(
+                      fontSize: 18.0,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold)),
+              subtitle: Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Container(
+                  child: Column(children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Text(document['degree'],
+                              style: TextStyle(
+                                  fontSize: 16.0, color: Colors.blueGrey)),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(document['field'],
-                          style: TextStyle(
-                              fontSize: 16.0, color: Colors.blueGrey)),
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Text(document['field'],
+                              style: TextStyle(
+                                  fontSize: 16.0, color: Colors.blueGrey)),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: Text(
-                          document['startyear'] + ' - ' + document['endyear'],
-                          style: TextStyle(
-                              fontSize: 16.0, fontWeight: FontWeight.bold)),
+                    Row(
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text(
+                              document['startyear'] + ' - ' + document['endyear'],
+                              style: TextStyle(
+                                  fontSize: 16.0, fontWeight: FontWeight.bold)),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
 
-              ]),
+                  ]),
+                ),
+              ),
+              trailing: IconButton(
+                  icon: Icon(Icons.edit),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                UpdateEducationDetails(
+                                  institute: document['institute'],
+                                  description: document['description'],
+                                  degree: document['degree'],
+                                  startyear: document['startyear'],
+                                  endyear: document['endyear'],
+                                  field: document['field'],
+                                  documentRef: document.documentID,
+                                )));
+                  }),
             ),
           ),
-          trailing: IconButton(
-              icon: Icon(Icons.edit),
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (BuildContext context) =>
-                            UpdateEducationDetails(
-                              institute: document['institute'],
-                              description: document['description'],
-                              degree: document['degree'],
-                              startyear: document['startyear'],
-                              endyear: document['endyear'],
-                              field: document['field'],
-                              documentRef: document.documentID,
-                            )));
-              }),
-        ),
+          Divider(height: 0,)
+        ],
       ),
     );
   }

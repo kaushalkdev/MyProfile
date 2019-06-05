@@ -156,86 +156,91 @@ class _ProfessionalDetailsState extends State<ProfessionalDetails> {
         ),
       ),
       direction: DismissDirection.endToStart,
-      child: Padding(
-        padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-        child: ListTile(
-          leading: Icon(
-            Icons.account_balance,
-            size: 30.0,
-          ),
-          title: Text(document['designation'],
-              style: TextStyle(
-                  fontSize: 20.0,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold)),
-          subtitle: Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Container(
-              child: Column(children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(document['company'],
-                          style: TextStyle(
-                              fontSize: 16.0,
-                              color: Colors.blueGrey,
-                              fontWeight: FontWeight.bold)),
+      child: Column(
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
+            child: ListTile(
+              leading: Icon(
+                Icons.account_balance,
+                size: 30.0,
+              ),
+              title: Text(document['designation'],
+                  style: TextStyle(
+                      fontSize: 20.0,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold)),
+              subtitle: Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Container(
+                  child: Column(children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Text(document['company'],
+                              style: TextStyle(
+                                  fontSize: 16.0,
+                                  color: Colors.blueGrey,
+                                  fontWeight: FontWeight.bold)),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    Text(
-                        document['startmonth'] +
-                            ' ' +
-                            document['startyear'] +
-                            ' - ' +
-                            document['endmonth'] +
-                            ' ' +
-                            document['endyear'],
-                        style: TextStyle(
-                            fontSize: 16.0,
-                            color: Colors.blueGrey,
-                            fontWeight: FontWeight.bold)),
-                  ],
-                ),
-                SizedBox(
-                  height: 8.0,
-                ),
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(document['description'],
-                          style: TextStyle(
-                            fontSize: 16.0,
-                          )),
+                    Row(
+                      children: <Widget>[
+                        Text(
+                            document['startmonth'] +
+                                ' ' +
+                                document['startyear'] +
+                                ' - ' +
+                                document['endmonth'] +
+                                ' ' +
+                                document['endyear'],
+                            style: TextStyle(
+                                fontSize: 16.0,
+                                color: Colors.blueGrey,
+                                fontWeight: FontWeight.bold)),
+                      ],
                     ),
-                  ],
+                    SizedBox(
+                      height: 8.0,
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Text(document['description'],
+                              style: TextStyle(
+                                fontSize: 16.0,
+                              )),
+                        ),
+                      ],
+                    ),
+                  ]),
                 ),
-              ]),
+              ),
+              trailing: IconButton(
+                  icon: Icon(Icons.edit),
+                  onPressed: () {
+                    checkConnectivity();
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                UpdateProfessionalDetails(
+                                  company: document['company'],
+                                  descriptiom: document['description'],
+                                  designation: document['designation'],
+                                  documentref: document.documentID,
+                                  endyear: document['endyear'],
+                                  endmonth: document['endmonth'],
+                                  startyear: document['startyear'],
+                                  startmonth: document['startmonth'],
+                                  location: document['location'],
+                                )));
+                  }),
             ),
           ),
-          trailing: IconButton(
-              icon: Icon(Icons.edit),
-              onPressed: () {
-                checkConnectivity();
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (BuildContext context) =>
-                            UpdateProfessionalDetails(
-                              company: document['company'],
-                              descriptiom: document['description'],
-                              designation: document['designation'],
-                              documentref: document.documentID,
-                              endyear: document['endyear'],
-                              endmonth: document['endmonth'],
-                              startyear: document['startyear'],
-                              startmonth: document['startmonth'],
-                              location: document['location'],
-                            )));
-              }),
-        ),
+          Divider(height: 0,)
+        ],
       ),
     );
   }
@@ -294,9 +299,7 @@ class _ProfessionalDetailsState extends State<ProfessionalDetails> {
         ),
         body: Column(
           children: <Widget>[
-            SizedBox(
-              height: 10,
-            ),
+
             Expanded(
               child: Container(
                 width: MediaQuery.of(context).size.width,

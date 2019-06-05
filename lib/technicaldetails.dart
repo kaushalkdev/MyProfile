@@ -125,75 +125,80 @@ class _TechnicalDetailsState extends State<TechnicalDetails> {
         ),
       ),
       direction: DismissDirection.endToStart,
-      child: Padding(
-        padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-        child: ListTile(
-          leading: Icon(
-            Icons.account_balance,
-            size: 30.0,
-          ),
-          title: Text(document['company'],
-              style: TextStyle(
-                  fontSize: 20.0,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold)),
-          subtitle: Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Container(
-              child: Column(children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(document['projectname'],
-                          style: TextStyle(
-                              fontSize: 16.0,
-                              color: Colors.blueGrey,
-                              fontWeight: FontWeight.bold)),
+      child: Column(
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
+            child: ListTile(
+              leading: Icon(
+                Icons.account_balance,
+                size: 30.0,
+              ),
+              title: Text(document['company'],
+                  style: TextStyle(
+                      fontSize: 20.0,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold)),
+              subtitle: Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Container(
+                  child: Column(children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Text(document['projectname'],
+                              style: TextStyle(
+                                  fontSize: 16.0,
+                                  color: Colors.blueGrey,
+                                  fontWeight: FontWeight.bold)),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    Text(document['startdate'] + ' - ' + document['enddate'],
-                        style: TextStyle(
-                            fontSize: 16.0,
-                            color: Colors.blueGrey,
-                            fontWeight: FontWeight.bold)),
-                  ],
-                ),
-                SizedBox(
-                  height: 8.0,
-                ),
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(document['description'],
-                          style: TextStyle(
-                            fontSize: 16.0,
-                          )),
+                    Row(
+                      children: <Widget>[
+                        Text(document['startdate'] + ' - ' + document['enddate'],
+                            style: TextStyle(
+                                fontSize: 16.0,
+                                color: Colors.blueGrey,
+                                fontWeight: FontWeight.bold)),
+                      ],
                     ),
-                  ],
+                    SizedBox(
+                      height: 8.0,
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Text(document['description'],
+                              style: TextStyle(
+                                fontSize: 16.0,
+                              )),
+                        ),
+                      ],
+                    ),
+                  ]),
                 ),
-              ]),
+              ),
+              trailing: IconButton(
+                  icon: Icon(Icons.edit),
+                  onPressed: () {
+                    checkConnectivity();
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (BuildContext context) => UpdateTechnicalForm(
+                                  institute: document['company'],
+                                  projectname: document['projectname'],
+                                  startdate: document['startdate'],
+                                  enddate: document['enddate'],
+                                  descriptiom: document['description'],
+                                  documentref: document.documentID,
+                                )));
+                  }),
             ),
           ),
-          trailing: IconButton(
-              icon: Icon(Icons.edit),
-              onPressed: () {
-                checkConnectivity();
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (BuildContext context) => UpdateTechnicalForm(
-                              institute: document['company'],
-                              projectname: document['projectname'],
-                              startdate: document['startdate'],
-                              enddate: document['enddate'],
-                              descriptiom: document['description'],
-                              documentref: document.documentID,
-                            )));
-              }),
-        ),
+          Divider(height: 0,)
+        ],
       ),
     );
   }
