@@ -15,7 +15,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Widget progress(bool visibility) {
     return Visibility(
         child: CircularProgressIndicator(
-          valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF26D2DC)),
+          valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF4074c4)),
         ),
         visible: visibility);
   }
@@ -28,7 +28,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           context: context,
           builder: (BuildContext context) {
             return WillPopScope(
-              onWillPop:()async=> false ,
+              onWillPop: () async => false,
               child: AlertDialog(
                 title: Text('Oops! Internet lost'),
                 content: Text(
@@ -37,8 +37,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   FlatButton(
                     child: Text('OK'),
                     onPressed: () {
-                     checkConnectivity();
-                     Navigator.pop(context);
+                      checkConnectivity();
+                      Navigator.pop(context);
                     },
                   )
                 ],
@@ -71,27 +71,31 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Stack(
-          alignment: Alignment(0, 0.5),
+        body: Stack(
           children: <Widget>[
-            Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 60.0),
-                  child: Image.asset(
-                    'assets/professional.jpeg',
-                    width: 350,
-                    height: 350,
+            Container(
+              alignment: Alignment(0, 0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 60.0),
+                    child: Image.asset(
+                      'assets/appIcon.png',
+                      fit: BoxFit.fill,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-            progress(_visibility)
+            Container(
+                alignment: Alignment(0, 0.7),
+                child: progress(_visibility)),
+
           ],
-        ),
-      ),
-    );
+        ));
+
+
+
   }
 }

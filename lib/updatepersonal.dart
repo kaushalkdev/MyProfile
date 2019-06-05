@@ -76,7 +76,7 @@ class _UpdatePersonalDetailsState extends State<UpdatePersonalDetails> {
     return Visibility(
         child: Center(
           child: CircularProgressIndicator(
-            valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF26D2DC)),
+            valueColor: new AlwaysStoppedAnimation<Color>(Color(0xff4074c4)),
           ),
         ),
         visible: visibility);
@@ -151,7 +151,7 @@ class _UpdatePersonalDetailsState extends State<UpdatePersonalDetails> {
       child: Scaffold(
         appBar: AppBar(
           title: Text('Personal'),
-          backgroundColor: Color(0xFF26D2DC),
+          backgroundColor: Color(0xff4074c4),
           actions: <Widget>[
             IconButton(
               icon: Icon(Icons.check),
@@ -253,7 +253,7 @@ class _UpdatePersonalDetailsState extends State<UpdatePersonalDetails> {
                                         onChanged: (int e) {
                                           action(e);
                                         },
-                                        activeColor: Colors.blue,
+                                        activeColor: Color(0xff4074c4),
                                         value: 1,
                                         groupValue: groupValue,
                                       ),
@@ -265,7 +265,7 @@ class _UpdatePersonalDetailsState extends State<UpdatePersonalDetails> {
                                         onChanged: (int e) {
                                           action(e);
                                         },
-                                        activeColor: Colors.blue,
+                                        activeColor: Color(0xff4074c4),
                                         value: 2,
                                         groupValue: groupValue,
                                       )

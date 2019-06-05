@@ -47,9 +47,9 @@ class _loginUserState extends State<loginUser> {
   Widget progress(bool visibility) {
     return Visibility(
         child: Container(
-          alignment: Alignment(0, 0.55),
+          alignment: Alignment(0, 0.7),
           child: CircularProgressIndicator(
-            valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF26D2DC)),
+            valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF4074c4)),
           ),
         ),
         visible: visibility);
@@ -154,54 +154,38 @@ class _loginUserState extends State<loginUser> {
         return new userProfile();
 
       case AuthStatus.notSignedIn:
-        return Scaffold(
-            appBar: null,
-            body: Stack(
-              children: <Widget>[
-                Flex(
-                  direction: Axis.vertical,
-                  children: <Widget>[
-                    Expanded(
-                        child: Image.asset(
-                      'assets/professional.jpeg',
+        return Scaffold( body: Stack(
+          children: <Widget>[
+            Container(
+              alignment: Alignment(0, 0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 60.0),
+                    child: Image.asset(
+                      'assets/appIcon.png',
                       fit: BoxFit.fill,
-                    ))
-                  ],
-                ),
-
-//                   Container(
-//
-//                    alignment: Alignment(0, 0),
-//                    child: Column(
-//                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-//                      children: <Widget>[
-//                        Padding(
-//                          padding: const EdgeInsets.only(bottom: 60.0),
-//                          child: Image.asset(
-//                            'assets/professional.jpeg',
-//                            fit: BoxFit.fill,
-//                          ),
-//                        ),
-//                      ],
-//                    ),
-//
-//                  ),
-
-                progress(visibility),
-                Container(
-                  alignment: Alignment(0.0, 0.8),
-                  child: Visibility(
-                    child: GoogleSignInButton(
-                      onPressed: () {
-                        checkConnectivity();
-                      },
-                      darkMode: true, // default: false
                     ),
-                    visible: btnVisibility,
                   ),
+                ],
+              ),
+            ),
+            progress(visibility),
+            Container(
+              alignment: Alignment(0.0, 0.8),
+              child: Visibility(
+                child: GoogleSignInButton(
+                  onPressed: () {
+                    checkConnectivity();
+                  },
+                  darkMode: true, // default: false
                 ),
-              ],
-            ));
+                visible: btnVisibility,
+              ),
+            ),
+          ],
+        ));
     }
   }
 }

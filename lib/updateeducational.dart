@@ -108,7 +108,7 @@ class _UpdateEducationDetailsState extends State<UpdateEducationDetails> {
     return Visibility(
         child: Center(
           child: CircularProgressIndicator(
-            valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF26D2DC)),
+            valueColor: new AlwaysStoppedAnimation<Color>(Color(0xff4074c4)),
           ),
         ),
         visible: visibility);
@@ -136,7 +136,7 @@ class _UpdateEducationDetailsState extends State<UpdateEducationDetails> {
     return Scaffold(
         appBar: AppBar(
           title: Text('Education'),
-          backgroundColor: Color(0xFF26D2DC),
+          backgroundColor: Color(0xff4074c4),
           actions: <Widget>[
             IconButton(
               icon: Icon(Icons.check),

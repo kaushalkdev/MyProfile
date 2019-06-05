@@ -70,7 +70,7 @@ class _TechnicalDetailsState extends State<TechnicalDetails> {
               child: IconButton(
                   icon: Icon(
                     Icons.build,
-                    color: Color(0xFF26D2DC),
+                    color: Color(0xFF4074c4),
                   ),
                   onPressed: () {
                     Navigator.pushReplacement(
@@ -87,120 +87,116 @@ class _TechnicalDetailsState extends State<TechnicalDetails> {
   Widget buildListItem(BuildContext context, DocumentSnapshot document) {
     progress(false);
     return Dismissible(
-        key: Key(document.documentID),
-        confirmDismiss: (direction) async {
-          final bool res = await showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: const Text("Confirm"),
-                  content: const Text("Do you want to delete this item?"),
-                  actions: <Widget>[
-                    FlatButton(
-                        onPressed: () {
-                          Navigator.of(context).pop(true);
-                          Firestore.instance
-                              .collection('users')
-                              .document('technical')
-                              .collection(userid)
-                              .document(document.documentID)
-                              .delete();
-                        },
-                        child: const Text("DELETE")),
-                    FlatButton(
-                      onPressed: () => Navigator.of(context).pop(false),
-                      child: const Text("CANCEL"),
-                    )
-                  ],
-                );
-              });
-        },
-        background: Container(
-          alignment: Alignment(0.8, 0),
-          color: Color(0xffe8eaed),
-          child: Icon(
-            Icons.delete,
-            color: Colors.grey,
-            size: 35.0,
-          ),
+      key: Key(document.documentID),
+      confirmDismiss: (direction) async {
+        final bool res = await showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text("Confirm"),
+                content: const Text("Do you want to delete this item?"),
+                actions: <Widget>[
+                  FlatButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(true);
+                        Firestore.instance
+                            .collection('users')
+                            .document('technical')
+                            .collection(userid)
+                            .document(document.documentID)
+                            .delete();
+                      },
+                      child: const Text("DELETE")),
+                  FlatButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: const Text("CANCEL"),
+                  )
+                ],
+              );
+            });
+      },
+      background: Container(
+        alignment: Alignment(0.8, 0),
+        color: Color(0xffe8eaed),
+        child: Icon(
+          Icons.delete,
+          color: Colors.grey,
+          size: 35.0,
         ),
-        direction: DismissDirection.endToStart,
-        child: Card(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-            child: ListTile(
-              leading: Icon(
-                Icons.account_balance,
-                size: 30.0,
-              ),
-              title: Text(document['company'],
-                  style: TextStyle(
-                      fontSize: 20.0,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold)),
-              subtitle: Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Container(
-                  child: Column(children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: Text(document['projectname'],
-                              style: TextStyle(
-                                  fontSize: 16.0,
-                                  color: Colors.blueGrey,
-                                  fontWeight: FontWeight.bold)),
-                        ),
-                      ],
+      ),
+      direction: DismissDirection.endToStart,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
+        child: ListTile(
+          leading: Icon(
+            Icons.account_balance,
+            size: 30.0,
+          ),
+          title: Text(document['company'],
+              style: TextStyle(
+                  fontSize: 20.0,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold)),
+          subtitle: Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Container(
+              child: Column(children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Text(document['projectname'],
+                          style: TextStyle(
+                              fontSize: 16.0,
+                              color: Colors.blueGrey,
+                              fontWeight: FontWeight.bold)),
                     ),
-                    Row(
-                      children: <Widget>[
-                        Text(
-                            document['startdate'] + ' - ' + document['enddate'],
-                            style: TextStyle(
-                                fontSize: 16.0,
-                                color: Colors.blueGrey,
-                                fontWeight: FontWeight.bold)),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 8.0,
-                    ),
-                    Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: Text(document['description'],
-                              style: TextStyle(
-                                fontSize: 16.0,
-                              )),
-                        ),
-                      ],
-                    ),
-                  ]),
+                  ],
                 ),
-              ),
-              trailing: IconButton(
-                  icon: Icon(Icons.edit),
-                  onPressed: () {
-                    checkConnectivity();
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                UpdateTechnicalForm(
-                                  institute: document['company'],
-                                  projectname: document['projectname'],
-                                  startdate: document['startdate'],
-                                  enddate: document['enddate'],
-                                  descriptiom: document['description'],
-                                  documentref: document.documentID,
-                                )));
-                  }),
+                Row(
+                  children: <Widget>[
+                    Text(document['startdate'] + ' - ' + document['enddate'],
+                        style: TextStyle(
+                            fontSize: 16.0,
+                            color: Colors.blueGrey,
+                            fontWeight: FontWeight.bold)),
+                  ],
+                ),
+                SizedBox(
+                  height: 8.0,
+                ),
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Text(document['description'],
+                          style: TextStyle(
+                            fontSize: 16.0,
+                          )),
+                    ),
+                  ],
+                ),
+              ]),
             ),
           ),
-        ));
+          trailing: IconButton(
+              icon: Icon(Icons.edit),
+              onPressed: () {
+                checkConnectivity();
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (BuildContext context) => UpdateTechnicalForm(
+                              institute: document['company'],
+                              projectname: document['projectname'],
+                              startdate: document['startdate'],
+                              enddate: document['enddate'],
+                              descriptiom: document['description'],
+                              documentref: document.documentID,
+                            )));
+              }),
+        ),
+      ),
+    );
   }
-
 
   checkConnectivity() async {
     var result = await Connectivity().checkConnectivity();
@@ -210,7 +206,7 @@ class _TechnicalDetailsState extends State<TechnicalDetails> {
           context: context,
           builder: (BuildContext context) {
             return WillPopScope(
-              onWillPop: ()async=> false,
+              onWillPop: () async => false,
               child: AlertDialog(
                 title: Text('Oops! Internet lost'),
                 content: Text(
@@ -221,28 +217,21 @@ class _TechnicalDetailsState extends State<TechnicalDetails> {
                     onPressed: () {
                       checkConnectivity();
                       Navigator.pop(context);
-                     // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>WelcomeScreen()));
-
+                      // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>WelcomeScreen()));
                     },
                   )
                 ],
-
-
               ),
             );
           });
     } else if (result == ConnectivityResult.mobile) {
-
-    } else if (result == ConnectivityResult.wifi) {
-
-    }
+    } else if (result == ConnectivityResult.wifi) {}
   }
-
 
   Widget progress(bool visibility) {
     return Visibility(
         child: CircularProgressIndicator(
-          valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF26D2DC)),
+          valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF4074c4)),
         ),
         visible: visibility);
   }
@@ -285,16 +274,13 @@ class _TechnicalDetailsState extends State<TechnicalDetails> {
                           builder: (BuildContext context) => TechnicalForm()));
                 }),
           ],
-          backgroundColor: Color(0xff26D2DC),
+          backgroundColor: Color(0xFF4074c4),
         ),
         bottomNavigationBar: BottomAppBar(
           child: _buildButtons(),
         ),
         body: Column(
           children: <Widget>[
-            SizedBox(
-              height: 10,
-            ),
             Expanded(
               child: Container(
                 width: MediaQuery.of(context).size.width,

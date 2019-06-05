@@ -41,7 +41,7 @@ class _userProfileState extends State<userProfile> {
   Widget progress(bool visibility) {
     return Visibility(
         child: CircularProgressIndicator(
-          valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF26D2DC)),
+          valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF4074c4)),
         ),
         visible: visibility);
   }
@@ -211,7 +211,7 @@ class _userProfileState extends State<userProfile> {
               },
               child: Icon(
                 Icons.apps,
-                color: Color(0xFF26D2DC),
+                color: Color(0xFF4074c4),
               )),
           VerticalDivider(
             color: Colors.blueGrey,
@@ -220,7 +220,7 @@ class _userProfileState extends State<userProfile> {
               onTap: () {
                 modal.openSettings(context);
               },
-              child: Icon(Icons.settings, color: Color(0xFF26D2DC)))
+              child: Icon(Icons.settings, color: Color(0xFF4074c4)))
         ],
       ),
     );
@@ -343,8 +343,11 @@ class _userProfileState extends State<userProfile> {
     Size screenSize = MediaQuery.of(context).size;
     return Scaffold(
       appBar: null,
-      bottomNavigationBar: BottomAppBar(
-        child: _buildButtons(),
+      bottomNavigationBar: Visibility(
+        visible:_visibleProfile,
+        child: BottomAppBar(
+          child: _buildButtons(),
+        ),
       ),
       body: Stack(
         children: <Widget>[

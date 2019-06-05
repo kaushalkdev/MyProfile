@@ -93,7 +93,7 @@ class _TechnicalFormState extends State<TechnicalForm> {
     return Visibility(
         child: Center(
           child: CircularProgressIndicator(
-            valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF26D2DC)),
+            valueColor: new AlwaysStoppedAnimation<Color>(Color(0xff4074c4)),
           ),
         ),
         visible: visibility);
@@ -168,7 +168,7 @@ class _TechnicalFormState extends State<TechnicalForm> {
             },
           ),
         ],
-        backgroundColor: Color(0xFF26D2DC),
+        backgroundColor: Color(0xff4074c4),
       ),
       body: (onpress == true)
           ? progress(true)

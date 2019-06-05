@@ -35,7 +35,7 @@ class _PersonalDetailsState extends State<PersonalDetails> {
               child: IconButton(
                   icon: Icon(
                     Icons.person,
-                    color: Color(0xFF26D2DC),
+                    color: Color(0xFF4074c4),
                   ),
                   onPressed: () {
                     Navigator.pushReplacement(
@@ -268,7 +268,7 @@ class _PersonalDetailsState extends State<PersonalDetails> {
   Widget progress(bool visibility) {
     return Visibility(
         child: CircularProgressIndicator(
-          valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF26D2DC)),
+          valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF4074c4)),
         ),
         visible: visibility);
   }
@@ -305,7 +305,7 @@ class _PersonalDetailsState extends State<PersonalDetails> {
                               )));
                 })
           ],
-          backgroundColor: Color(0xff26D2DC),
+          backgroundColor: Color(0xFF4074c4),
         ),
         bottomNavigationBar: BottomAppBar(
           child: _buildButtons(),

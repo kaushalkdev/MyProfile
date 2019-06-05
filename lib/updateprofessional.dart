@@ -234,7 +234,7 @@ class _UpdateProfessionalDetailsState extends State<UpdateProfessionalDetails> {
     return Scaffold(
         appBar: AppBar(
           title: Text('Professional'),
-          backgroundColor: Color(0xFF26D2DC),
+          backgroundColor: Color(0xff4074c4),
           actions: <Widget>[
             IconButton(
               icon: Icon(Icons.check),
@@ -318,7 +318,7 @@ class _UpdateProfessionalDetailsState extends State<UpdateProfessionalDetails> {
                                     children: <Widget>[
                                       Text('I currently work here'),
                                       Checkbox(
-                                        activeColor: Color(0xFF26D2DC),
+                                        activeColor: Color(0xff4074c4),
                                         value: val,
                                         onChanged: (bool value) {
                                           setState(() {
@@ -486,7 +486,7 @@ class _UpdateProfessionalDetailsState extends State<UpdateProfessionalDetails> {
     return Visibility(
         child: Center(
           child: CircularProgressIndicator(
-            valueColor: new AlwaysStoppedAnimation<Color>(Color(0xFF26D2DC)),
+            valueColor: new AlwaysStoppedAnimation<Color>(Color(0xff4074c4)),
           ),
         ),
         visible: visibility);
