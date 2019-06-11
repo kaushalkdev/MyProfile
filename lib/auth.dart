@@ -33,7 +33,7 @@ class AuthService {
   }
 
   Future<FirebaseUser> googleSignIn() async {
-// Start
+    // Start
     loading.add(true);
 
     // Step 1

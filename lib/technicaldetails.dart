@@ -156,7 +156,8 @@ class _TechnicalDetailsState extends State<TechnicalDetails> {
                     ),
                     Row(
                       children: <Widget>[
-                        Text(document['startdate'] + ' - ' + document['enddate'],
+                        Text(
+                            document['startdate'] + ' - ' + document['enddate'],
                             style: TextStyle(
                                 fontSize: 16.0,
                                 color: Colors.blueGrey,
@@ -186,7 +187,8 @@ class _TechnicalDetailsState extends State<TechnicalDetails> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (BuildContext context) => UpdateTechnicalForm(
+                            builder: (BuildContext context) =>
+                                UpdateTechnicalForm(
                                   institute: document['company'],
                                   projectname: document['projectname'],
                                   startdate: document['startdate'],
@@ -197,7 +199,9 @@ class _TechnicalDetailsState extends State<TechnicalDetails> {
                   }),
             ),
           ),
-          Divider(height: 0,)
+          Divider(
+            height: 0,
+          )
         ],
       ),
     );
@@ -245,7 +249,6 @@ class _TechnicalDetailsState extends State<TechnicalDetails> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    timeDilation = 2.0;
     checkConnectivity();
     widget.authService.getCurrentuser().then((userid) {
       setState(() {

@@ -118,7 +118,7 @@ class _EducationalDetailsState extends State<EducationalDetails> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    timeDilation = 2.0;
+
     widget.service.getCurrentuser().then((userid) {
       setState(() {
         this.userid = userid;
@@ -209,13 +209,14 @@ class _EducationalDetailsState extends State<EducationalDetails> {
                         Padding(
                           padding: const EdgeInsets.only(top: 8.0),
                           child: Text(
-                              document['startyear'] + ' - ' + document['endyear'],
+                              document['startyear'] +
+                                  ' - ' +
+                                  document['endyear'],
                               style: TextStyle(
                                   fontSize: 16.0, fontWeight: FontWeight.bold)),
                         ),
                       ],
                     ),
-
                   ]),
                 ),
               ),
@@ -238,7 +239,9 @@ class _EducationalDetailsState extends State<EducationalDetails> {
                   }),
             ),
           ),
-          Divider(height: 0,)
+          Divider(
+            height: 0,
+          )
         ],
       ),
     );
@@ -285,7 +288,6 @@ class _EducationalDetailsState extends State<EducationalDetails> {
         ),
         body: Column(
           children: <Widget>[
-
             Expanded(
               child: Container(
                 width: MediaQuery.of(context).size.width,

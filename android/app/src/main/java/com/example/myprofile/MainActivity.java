@@ -1,4 +1,4 @@
-package com.example.google_authentication;
+package com.example.myprofile;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;

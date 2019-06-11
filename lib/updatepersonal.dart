@@ -301,6 +301,7 @@ class _UpdatePersonalDetailsState extends State<UpdatePersonalDetails> {
                               hintText: "Address",
                             ),
                             initialValue: address,
+                              maxLength: 50,
                             validator: (String value) {
                               if (value.isEmpty ||
                                   RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')

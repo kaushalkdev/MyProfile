@@ -28,6 +28,8 @@ class userProfile extends StatefulWidget {
 }
 
 class _userProfileState extends State<userProfile> {
+  DocumentSnapshot documentSnapshot;
+
   Modal modal = new Modal();
   String userid;
   String image;
@@ -65,10 +67,6 @@ class _userProfileState extends State<userProfile> {
                     onPressed: () {
                       checkConnectivity();
                       Navigator.pop(context);
-//                      Navigator.pushReplacement(
-//                          context,
-//                          MaterialPageRoute(
-//                              builder: (context) => WelcomeScreen()));
                     },
                   )
                 ],
@@ -81,12 +79,9 @@ class _userProfileState extends State<userProfile> {
 
   Widget _buildCoverImage(Size screenSize) {
     return Container(
-      height: screenSize.height / 2.6,
+      height: screenSize.height / 3.2,
       decoration: BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage('assets/professional.jpeg'),
-          fit: BoxFit.cover,
-        ),
+        color: Color(0xFF4074c4),
       ),
     );
   }
@@ -107,6 +102,8 @@ class _userProfileState extends State<userProfile> {
             return new Text(" ");
           }
           var userDocument = snapshot.data;
+          setData(userDocument);
+
           return Text(
             userDocument['displayName'],
             style: _nameTextStyle,
@@ -198,7 +195,8 @@ class _userProfileState extends State<userProfile> {
     );
   }
 
-  Widget _buildStatContainer(BuildContext context, String userid) {
+  Widget _buildStatContainer(
+      BuildContext context, String userid, DocumentSnapshot docref) {
     return Container(
       height: 30.0,
       margin: EdgeInsets.only(top: 8.0),
@@ -218,7 +216,7 @@ class _userProfileState extends State<userProfile> {
           ),
           GestureDetector(
               onTap: () {
-                modal.openSettings(context);
+                modal.openSettings(context, userid, docref);
               },
               child: Icon(Icons.settings, color: Color(0xFF4074c4)))
         ],
@@ -243,6 +241,7 @@ class _userProfileState extends State<userProfile> {
             return new Text(" ");
           }
           var userDocument = snapshot.data;
+
           return Container(
             color: Theme.of(context).scaffoldBackgroundColor,
             padding: EdgeInsets.all(8.0),
@@ -321,7 +320,6 @@ class _userProfileState extends State<userProfile> {
   @override
   void initState() {
     super.initState();
-    timeDilation = 2.0;
 
     widget.authService.getCurrentuser().then((userId) {
       setState(() {
@@ -329,6 +327,7 @@ class _userProfileState extends State<userProfile> {
         print(" userid " + userid);
       });
     });
+
     Future.delayed(Duration(seconds: 5), () {
       checkConnectivity();
       setState(() {
@@ -344,7 +343,7 @@ class _userProfileState extends State<userProfile> {
     return Scaffold(
       appBar: null,
       bottomNavigationBar: Visibility(
-        visible:_visibleProfile,
+        visible: _visibleProfile,
         child: BottomAppBar(
           child: _buildButtons(),
         ),
@@ -369,7 +368,8 @@ class _userProfileState extends State<userProfile> {
                         ),
                         Builder(
                           builder: (BuildContext context) {
-                            return _buildStatContainer(context, userid);
+                            return _buildStatContainer(
+                                context, userid, documentSnapshot);
                           },
                         ),
                         SizedBox(
@@ -397,5 +397,13 @@ class _userProfileState extends State<userProfile> {
         ],
       ),
     );
+  }
+
+  Future setData(userDocument) async{
+    setState(() {
+      this.documentSnapshot = documentSnapshot;
+      print('document snapshot:  '+ documentSnapshot.toString());
+    });
+
   }
 }

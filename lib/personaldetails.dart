@@ -255,7 +255,7 @@ class _PersonalDetailsState extends State<PersonalDetails> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    timeDilation = 2.0;
+
     checkConnectivity();
     widget.authService.getCurrentuser().then((userId) {
       setState(() {

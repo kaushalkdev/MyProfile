@@ -74,8 +74,8 @@ class _loginUserState extends State<loginUser> {
           'email': user.email,
           'photoURL': user.photoUrl,
           'displayName': user.displayName,
-          'bio': 'Freelancer',
-          'status': 'Student',
+          'bio': 'Update Bio. eg. I am a software developer and has experience in android and flutter application designing',
+          'status': 'Update Status eg. Software developer',
           'lastSeen': DateTime.now()
         }).whenComplete(() {
           _db.collection('personal').document(user.uid).setData({
@@ -111,7 +111,7 @@ class _loginUserState extends State<loginUser> {
   @override
   void initState() {
     super.initState();
-    timeDilation = 2.0;
+
     widget.authService.getCurrentuser().then((userid) {
       setState(() {
         authStatus =
@@ -154,7 +154,8 @@ class _loginUserState extends State<loginUser> {
         return new userProfile();
 
       case AuthStatus.notSignedIn:
-        return Scaffold( body: Stack(
+        return Scaffold(
+            body: Stack(
           children: <Widget>[
             Container(
               alignment: Alignment(0, 0),

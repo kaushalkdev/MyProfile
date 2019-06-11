@@ -33,6 +33,9 @@ dependencies:
   flutter_screenutil:
   flutter_auth_buttons:
   shared_preferences:
+  pdf:
+  image:
+  printing:
   connectivity:
 
 
@@ -69,6 +72,7 @@ flutter:
     - assets/defaultimage.png
     - assets/professional.jpeg
     - assets/appIcon.png
+
 
   #  - images/a_dot_ham.jpeg
 

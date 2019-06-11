@@ -3,18 +3,21 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
-import 'welcomescreen.dart';
+import 'package:pdf/pdf.dart';
+import 'pdfconversion.dart';
+import 'package:pdf/widgets.dart' as Pdf;
+import 'package:printing/printing.dart';
 import 'package:connectivity/connectivity.dart';
 import 'auth.dart';
 import 'dart:io';
 import 'main.dart';
 
-class Modal {
+class Modal extends StatefulWidget {
   AuthService authService = new AuthService();
+  CollectionReference db = Firestore.instance.collection('users');
 
   File _image;
-
-  String userId;
+  String userid = 'somwthing', name, email, address;
 
   checkConnectivity(BuildContext context) async {
     var result = await Connectivity().checkConnectivity();
@@ -24,7 +27,7 @@ class Modal {
           context: context,
           builder: (BuildContext context) {
             return WillPopScope(
-              onWillPop: ()async=> false,
+              onWillPop: () async => false,
               child: AlertDialog(
                 title: Text('Oops! Internet lost'),
                 content: Text(
@@ -35,25 +38,141 @@ class Modal {
                     onPressed: () {
                       checkConnectivity(context);
                       Navigator.pop(context);
-                      //Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>WelcomeScreen()));
-
                     },
                   )
                 ],
-
-
               ),
             );
           });
     } else if (result == ConnectivityResult.mobile) {
-
-    } else if (result == ConnectivityResult.wifi) {
-
-    }
+    } else if (result == ConnectivityResult.wifi) {}
   }
 
+  List<int> buildPdf(PdfPageFormat format) {
+    email = 'kaushal.deligence@gmail.com';
+    address =
+        ' 106 & 107, 1st Floor, Jyoti Shikhar Tower,District Center, Janakpuri';
+    final PdfDoc pdf = PdfDoc()
+      ..addPage(Pdf.MultiPage(
+          pageFormat: PdfPageFormat.letter
+              .copyWith(marginBottom: 1.5 * PdfPageFormat.cm),
+          crossAxisAlignment: Pdf.CrossAxisAlignment.start,
+          footer: (Pdf.Context context) {
+            return Pdf.Container(
+                alignment: Pdf.Alignment.centerRight,
+                margin: const Pdf.EdgeInsets.only(top: 1.0 * PdfPageFormat.cm),
+                child: Pdf.Text(
+                    'Page ${context.pageNumber} of ${context.pagesCount}',
+                    style: Pdf.Theme.of(context)
+                        .defaultTextStyle
+                        .copyWith(color: PdfColors.grey)));
+          },
+          build: (Pdf.Context context) => <Pdf.Widget>[
+                Pdf.Header(
+                    level: 0,
+                    child: Pdf.Row(
+                        mainAxisAlignment: Pdf.MainAxisAlignment.center,
+                        children: <Pdf.Widget>[
+                          Pdf.Text('Resume', textScaleFactor: 2),
+                        ])),
 
-  void openSettings(BuildContext context) {
+                Pdf.Paragraph(text: ''),
+                Pdf.Column(children: <Pdf.Widget>[
+                  //bio start
+                  Pdf.Row(children: <Pdf.Widget>[
+                    Pdf.Text('Name: ',
+                        style: Pdf.TextStyle(fontWeight: Pdf.FontWeight.bold)),
+                    Pdf.Text(name),
+                  ]),
+                  Pdf.Row(children: <Pdf.Widget>[
+                    Pdf.Text('Email: ',
+                        style: Pdf.TextStyle(fontWeight: Pdf.FontWeight.bold)),
+                    Pdf.Text(email),
+                  ]),
+                  Pdf.Row(children: <Pdf.Widget>[
+                    Pdf.Paragraph(
+                        text: 'Address: ',
+                        style: Pdf.TextStyle(fontWeight: Pdf.FontWeight.bold)),
+                    Pdf.Paragraph(text: address),
+                  ]),
+                  //bio end
+                ]),
+
+                // Educational details
+                Pdf.Header(level: 1, text: 'Profile'),
+                Pdf.Paragraph(
+                    text:
+                        'I am a full stack Software Developer and develops Mobile applications. Have experience in app designing with Fultter and Android Studio.'),
+
+                Pdf.Header(level: 1, text: 'Education Details'),
+
+                Pdf.Header(
+                    level: 3,
+                    text: 'Higher Secondary',
+                    textStyle: Pdf.TextStyle(fontWeight: Pdf.FontWeight.bold)),
+                Pdf.Bullet(text: 'Institution: Kv.No.1 Delhi Cantt'),
+                Pdf.Bullet(text: 'Field of Study: Science'),
+                Pdf.Bullet(text: 'Year: 2011 - 2012'),
+
+                Pdf.Header(
+                    level: 3,
+                    text: 'Senior Secondary',
+                    textStyle: Pdf.TextStyle(fontWeight: Pdf.FontWeight.bold)),
+                Pdf.Bullet(text: 'Institution: Kv.No.1 Delhi Cantt'),
+                Pdf.Bullet(text: 'Field of Study: PCM'),
+                Pdf.Bullet(text: 'Year: 2013 - 2014'),
+
+                Pdf.Header(
+                    level: 3,
+                    text: 'B.Tech',
+                    textStyle: Pdf.TextStyle(fontWeight: Pdf.FontWeight.bold)),
+                Pdf.Bullet(
+                    text:
+                        'Institution: Maharaja Surajmal Institute of Technology'),
+                Pdf.Bullet(text: 'Field of Study: ECE'),
+                Pdf.Bullet(text: 'Year: 2014 - 2018'),
+                Pdf.Paragraph(text: ''),
+
+                //project details
+                Pdf.Header(level: 1, text: 'Project Details'),
+
+                Pdf.Header(
+                    level: 3,
+                    text: 'MYProfile App',
+                    textStyle: Pdf.TextStyle(fontWeight: Pdf.FontWeight.bold)),
+                Pdf.Bullet(text: 'Deligence Technologies'),
+                Pdf.Bullet(text: '19/05/2019 - 10/06/2019'),
+                Pdf.Bullet(
+                    text:
+                        'Description: The App helps in creating profile for users which they can share in form of Pdf. '),
+                Pdf.Header(
+                    level: 3,
+                    text: 'TextToSpeech Chat App',
+                    textStyle: Pdf.TextStyle(fontWeight: Pdf.FontWeight.bold)),
+                Pdf.Bullet(text: 'Deligence Technologies'),
+                Pdf.Bullet(text: '15/03/2019 - 26/03/2019'),
+                Pdf.Bullet(
+                    text:
+                        'Description: The App is simple chat app with speech out. User can send message to each other and can read as well as hear the messge. '),
+
+                //professional detials
+                Pdf.Header(level: 1, text: 'Professional Experience'),
+
+                Pdf.Header(
+                    level: 3,
+                    text: 'Software Developer',
+                    textStyle: Pdf.TextStyle(fontWeight: Pdf.FontWeight.bold)),
+                Pdf.Bullet(text: 'Deligence Technologies'),
+                Pdf.Bullet(text: 'Mar 2019 - present'),
+                Pdf.Bullet(
+                    text:
+                        'Description: The comapny mainly deals with developement of web aps and android and ios developement.'),
+              ]));
+
+    return pdf.save();
+  }
+
+  void openSettings(BuildContext context, String userid, DocumentSnapshot docref) {
     showModalBottomSheet(
         context: context,
         builder: (BuildContext context) {
@@ -68,18 +187,21 @@ class Modal {
                 padding: const EdgeInsets.all(8.0),
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.pop(context);
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (BuildContext context) => Conversion()));
                   },
                   child: Row(
                     children: <Widget>[
                       Icon(
-                        Icons.share,
+                        Icons.cached,
                         color: Colors.blue,
                       ),
                       Padding(
                         padding: const EdgeInsets.only(left: 16.0),
                         child: Text(
-                          "Share Profile",
+                          "Convert to pdf",
                           style: TextStyle(fontSize: 18, color: Colors.blue),
                         ),
                       )
@@ -130,11 +252,18 @@ class Modal {
             content: new Row(
               children: <Widget>[
                 new Expanded(
-                    child: new TextField(
+                    child: new TextFormField(
                   autofocus: true,
                   decoration: new InputDecoration(
                       labelText: 'Status', hintText: 'eg. Sowtware Developer.'),
-                  onChanged: (value) {
+                  validator: (String value) {
+                    if (value.isEmpty ||
+                        RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
+                            .hasMatch(value)) {
+                      return 'Please fill valid Status';
+                    }
+                  },
+                  onSaved: (value) {
                     status = value;
                   },
                 ))
@@ -164,11 +293,18 @@ class Modal {
             content: new Row(
               children: <Widget>[
                 new Expanded(
-                    child: new TextField(
+                    child: new TextFormField(
                   autofocus: true,
                   decoration: new InputDecoration(
                       labelText: 'Bio', hintText: ' Describle your self.'),
-                  onChanged: (value) {
+                  validator: (String value) {
+                    if (value.isEmpty ||
+                        RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
+                            .hasMatch(value)) {
+                      return 'Please fill valid Bio';
+                    }
+                  },
+                  onSaved: (value) {
                     bio = value;
                   },
                 ))
@@ -319,5 +455,29 @@ class Modal {
         .collection('users')
         .document(userId)
         .setData({"status": value}, merge: true);
+  }
+
+  @override
+  _ModalState createState() => _ModalState();
+}
+
+class _ModalState extends State<Modal> {
+  @override
+  void initState() {
+    super.initState();
+
+    authService.getCurrentuser().then((userid) {
+      widget.userid = userid;
+    });
+    print('modal :' + widget.userid);
+    widget.db.document('44stl9raKpTz3pNf7fKeIxv9IO63').get().then((docref) {
+      widget.name = docref['displayName'];
+      print(widget.name);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container();
   }
 }

@@ -239,7 +239,9 @@ class _ProfessionalDetailsState extends State<ProfessionalDetails> {
                   }),
             ),
           ),
-          Divider(height: 0,)
+          Divider(
+            height: 0,
+          )
         ],
       ),
     );
@@ -257,7 +259,7 @@ class _ProfessionalDetailsState extends State<ProfessionalDetails> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    timeDilation = 2.0;
+
     checkConnectivity();
     widget.authService.getCurrentuser().then((userid) {
       setState(() {
@@ -299,7 +301,6 @@ class _ProfessionalDetailsState extends State<ProfessionalDetails> {
         ),
         body: Column(
           children: <Widget>[
-
             Expanded(
               child: Container(
                 width: MediaQuery.of(context).size.width,
