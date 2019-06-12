@@ -6,9 +6,7 @@ import 'technicaldetails.dart';
 import 'educationdetails.dart';
 
 class TabScreen extends StatefulWidget {
-
   int value;
-
 
   TabScreen({this.value});
 
@@ -32,13 +30,10 @@ class _TabScreenState extends State<TabScreen>
     super.initState();
     controller = new TabController(vsync: this, length: 4);
 
-
-    if(widget.value !=null){
-
+    if (widget.value != null) {
       controller.index = widget.value;
-      controller.addListener(_handleTabSelection);
     }
-
+    controller.addListener(_handleTabSelection);
   }
 
   @override
@@ -55,28 +50,28 @@ class _TabScreenState extends State<TabScreen>
               icon: Icon(
                 Icons.person,
                 color:
-                (controller.index == 0) ? Color(0xff4074c4) : Colors.grey,
+                    (controller.index == 0) ? Color(0xff4074c4) : Colors.grey,
               ),
             ),
             Tab(
               icon: Icon(
                 Icons.school,
                 color:
-                (controller.index == 1) ? Color(0xff4074c4) : Colors.grey,
+                    (controller.index == 1) ? Color(0xff4074c4) : Colors.grey,
               ),
             ),
             Tab(
               icon: Icon(
                 Icons.work,
                 color:
-                (controller.index == 2) ? Color(0xff4074c4) : Colors.grey,
+                    (controller.index == 2) ? Color(0xff4074c4) : Colors.grey,
               ),
             ),
             Tab(
               icon: Icon(
                 Icons.build,
                 color:
-                (controller.index == 3) ? Color(0xff4074c4) : Colors.grey,
+                    (controller.index == 3) ? Color(0xff4074c4) : Colors.grey,
               ),
             )
           ],
