@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'technicaldetails.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'auth.dart';
+import 'Tabs.dart';
 import 'package:connectivity/connectivity.dart';
 
 class UpdateTechnicalForm extends StatefulWidget {
@@ -152,7 +153,7 @@ class _UpdateTechnicalFormState extends State<UpdateTechnicalForm> {
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-              builder: (BuildContext context) => TechnicalDetails()));
+              builder: (BuildContext context) => TabScreen(value: 3,)));
     });
   }
 

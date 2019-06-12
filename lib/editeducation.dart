@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'auth.dart';
+import 'Tabs.dart';
 import 'welcomescreen.dart';
 import 'package:connectivity/connectivity.dart';
 import 'educationdetails.dart';
@@ -98,7 +99,7 @@ class _EducationFormState extends State<EducationForm> {
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-              builder: (BuildContext context) => EducationalDetails()));
+              builder: (BuildContext context) => TabScreen(value: 1,)));
     });
   }
 

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'professionaldetails.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'auth.dart';
+import 'Tabs.dart';
 import 'package:connectivity/connectivity.dart';
 
 class UpdateProfessionalDetails extends StatefulWidget {
@@ -245,7 +246,7 @@ class _UpdateProfessionalDetailsState extends State<UpdateProfessionalDetails> {
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-              builder: (BuildContext context) => ProfessionalDetails()));
+              builder: (BuildContext context) => TabScreen(value: 2,)));
     });
   }
 

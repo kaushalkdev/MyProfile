@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'professionaldetails.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'auth.dart';
+import 'Tabs.dart';
 import 'package:connectivity/connectivity.dart';
 
 class ProfessionalForm extends StatefulWidget {
@@ -180,7 +181,7 @@ class _ProfessionalFormState extends State<ProfessionalForm> {
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-              builder: (BuildContext context) => ProfessionalDetails()));
+              builder: (BuildContext context) => TabScreen(value: 2,)));
     });
   }
 

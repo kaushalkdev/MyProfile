@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/scheduler.dart' show timeDilation;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -256,69 +257,6 @@ class _userProfileState extends State<userProfile> {
         });
   }
 
-  Widget _buildButtons() {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          Expanded(
-              child: IconButton(
-                  icon: Icon(
-                    Icons.person,
-                    color: Colors.grey,
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                PersonalDetails()));
-                  })),
-          Expanded(
-              child: IconButton(
-                  icon: Icon(
-                    Icons.school,
-                    color: Colors.grey,
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                EducationalDetails()));
-                  })),
-          Expanded(
-              child: IconButton(
-                  icon: Icon(
-                    Icons.work,
-                    color: Colors.grey,
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                ProfessionalDetails()));
-                  })),
-          Expanded(
-              child: IconButton(
-                  icon: Icon(
-                    Icons.build,
-                    color: Colors.grey,
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                TechnicalDetails()));
-                  })),
-        ],
-      ),
-    );
-  }
-
   @override
   void initState() {
     super.initState();
@@ -337,6 +275,11 @@ class _userProfileState extends State<userProfile> {
         _visibleProfile = true;
       });
     });
+
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Color(0xFF4074c4), // status bar color
+      statusBarIconBrightness: Brightness.light
+    ));
   }
 
   @override
@@ -358,7 +301,6 @@ class _userProfileState extends State<userProfile> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-
       body: Stack(
         children: <Widget>[
           ListView(

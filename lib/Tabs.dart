@@ -6,6 +6,12 @@ import 'technicaldetails.dart';
 import 'educationdetails.dart';
 
 class TabScreen extends StatefulWidget {
+
+  int value;
+
+
+  TabScreen({this.value});
+
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
@@ -25,7 +31,14 @@ class _TabScreenState extends State<TabScreen>
   void initState() {
     super.initState();
     controller = new TabController(vsync: this, length: 4);
-    controller.addListener(_handleTabSelection);
+
+
+    if(widget.value !=null){
+
+      controller.index = widget.value;
+      controller.addListener(_handleTabSelection);
+    }
+
   }
 
   @override

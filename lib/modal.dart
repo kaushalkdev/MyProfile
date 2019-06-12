@@ -172,7 +172,12 @@ class Modal extends StatefulWidget {
     return pdf.save();
   }
 
-  void openSettings(BuildContext context, String userid, DocumentSnapshot docref) {
+
+
+  void openSettings(
+      BuildContext context, String userid, DocumentSnapshot docref) {
+
+
 
     showModalBottomSheet(
         context: context,
@@ -191,7 +196,9 @@ class Modal extends StatefulWidget {
                     Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                            builder: (BuildContext context) => Conversion(pdfPersonalDetails: docref,)));
+                            builder: (BuildContext context) => Conversion(
+                                  pdfPersonalDetails: 'email',
+                                )));
                   },
                   child: Row(
                     children: <Widget>[
@@ -462,7 +469,13 @@ class Modal extends StatefulWidget {
   _ModalState createState() => _ModalState();
 }
 
+
+
+
+
 class _ModalState extends State<Modal> {
+
+
   @override
   void initState() {
     super.initState();
@@ -472,10 +485,12 @@ class _ModalState extends State<Modal> {
     });
 
 
+
   }
 
   @override
   Widget build(BuildContext context) {
+
     return Container();
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'auth.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/scheduler.dart' show timeDilation;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -16,7 +17,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(title: 'FlutterBase', home: WelcomeScreen());
+    return MaterialApp(
+
+        title: 'FlutterBase',debugShowCheckedModeBanner: false, home: WelcomeScreen());
   }
 }
 
@@ -111,6 +114,12 @@ class _loginUserState extends State<loginUser> {
   @override
   void initState() {
     super.initState();
+
+
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.white12, // status bar color
+        statusBarIconBrightness: Brightness.dark
+    ));
 
     widget.authService.getCurrentuser().then((userid) {
       setState(() {

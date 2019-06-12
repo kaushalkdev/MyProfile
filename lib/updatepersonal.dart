@@ -3,6 +3,7 @@ import 'personaldetails.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'auth.dart';
 import 'package:connectivity/connectivity.dart';
+import 'Tabs.dart';
 
 class UpdatePersonalDetails extends StatefulWidget {
   AuthService authService = new AuthService();
@@ -334,7 +335,7 @@ class _UpdatePersonalDetailsState extends State<UpdatePersonalDetails> {
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-              builder: (BuildContext context) => PersonalDetails()));
+              builder: (BuildContext context) => TabScreen(value: 0,)));
     });
   }
 }

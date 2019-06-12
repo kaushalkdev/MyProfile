@@ -25,68 +25,7 @@ class _PersonalDetailsState extends State<PersonalDetails> {
   String Gender = '';
   String Address = '';
 
-  Widget _buildButtons() {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          Expanded(
-              child: IconButton(
-                  icon: Icon(
-                    Icons.person,
-                    color: Color(0xFF4074c4),
-                  ),
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                PersonalDetails()));
-                  })),
-          Expanded(
-              child: IconButton(
-                  icon: Icon(
-                    Icons.school,
-                    color: Colors.grey,
-                  ),
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                EducationalDetails()));
-                  })),
-          Expanded(
-              child: IconButton(
-                  icon: Icon(
-                    Icons.work,
-                    color: Colors.grey,
-                  ),
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                ProfessionalDetails()));
-                  })),
-          Expanded(
-              child: IconButton(
-                  icon: Icon(
-                    Icons.build,
-                    color: Colors.grey,
-                  ),
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                TechnicalDetails()));
-                  })),
-        ],
-      ),
-    );
-  }
+
 
   checkConnectivity() async {
     var result = await Connectivity().checkConnectivity();

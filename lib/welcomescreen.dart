@@ -2,6 +2,7 @@ import 'package:flutter/scheduler.dart' show timeDilation;
 import 'package:flutter/material.dart';
 import 'package:connectivity/connectivity.dart';
 import 'main.dart';
+import 'package:flutter/services.dart';
 import 'dart:async';
 
 class WelcomeScreen extends StatefulWidget {
@@ -57,6 +58,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   @override
   void initState() {
     super.initState();
+
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.white10, // status bar color
+      statusBarIconBrightness: Brightness.dark
+    ));
+
+
     Future.delayed(Duration(seconds: 5), () {
       checkConnectivity();
     });
