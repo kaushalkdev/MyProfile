@@ -62,6 +62,37 @@ class _UpdateProfessionalDetailsState extends State<UpdateProfessionalDetails> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool val = false;
 
+  int newYearStart, newYearEnd;
+  String newMonthStart, newMonthEnd;
+  String saalstart = "2019";
+  String saalend = "2019";
+  String mStart = "2019";
+  String mEnd = "2019";
+  List<String> months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sept',
+    'Oct',
+    'Nov',
+    'Dec'
+  ];
+
+  List<int> getList() {
+    List<int> year = new List<int>();
+    int y = 1980;
+    for (var i = y; i <= 2019; i++) {
+      year.add(y);
+      y = y + 1;
+    }
+    return year;
+  }
+
   Widget box(BuildContext context) {
     return Row(
       children: <Widget>[
@@ -76,48 +107,63 @@ class _UpdateProfessionalDetailsState extends State<UpdateProfessionalDetails> {
           width: 25.0,
         ),
         Container(
-          width: 100.0,
-          child: TextFormField(
-            decoration: InputDecoration(hintText: 'End Year'),
-            initialValue: endyear,
-            maxLength: 4,
-            keyboardType: TextInputType.number,
-            validator: (String value) {
-              if (value.isEmpty ||
-                  value.length > 4 ||
-                  value.length < 4 ||
-                  !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$').hasMatch(value) ||
-                  !(int.parse(value) >= 1980) ||
-                  !(int.parse(value) <= 2022)) {
-                return 'Invalid Year';
+          child: DropdownButton(
+            hint: Text('End Year'),
+            onChanged: (newValue) {
+              setState(() {
+                endyear = "${newValue}";
+                saalend = "${endyear}";
+                _professionalMap['endyear'] = saalend;
+              });
+
+              if (int.parse(endyear) < int.parse(startyear)) {
+                showDialog(
+                    context: context,
+                    builder: (BuildContext contect) {
+                      return AlertDialog(
+                        title: Text('Oops!'),
+                        content: Text('End Year is less than Start Year'),
+                        actions: <Widget>[
+                          FlatButton(
+                            child: Text('OK'),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          )
+                        ],
+                      );
+                    });
               }
             },
-            onSaved: (String value) {
-              _professionalMap['endyear'] = value;
-            },
+            value: int.parse(endyear),
+            items: getList().map<DropdownMenuItem<int>>((int value) {
+              return DropdownMenuItem<int>(
+                value: value,
+                child: Text(value.toString()),
+              );
+            }).toList(),
           ),
         ),
         SizedBox(
           width: 40.0,
         ),
         Container(
-          width: 100.0,
-          child: TextFormField(
-            decoration: InputDecoration(hintText: 'End Month'),
-            initialValue: endmonth,
-            maxLength: 3,
-            validator: (String value) {
-              if (value.isEmpty ||
-                  value.length > 3 ||
-                  value.length < 3 ||
-                  RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$').hasMatch(value) ||
-                  !checkMonth(value.toUpperCase())) {
-                return 'Invalid Month';
-              }
+          child: DropdownButton(
+            hint: Text('End Month'),
+            onChanged: (newValue) {
+              setState(() {
+                endmonth = "${newValue}";
+                mEnd = "${endmonth}";
+                _professionalMap['endmonth'] = mEnd;
+              });
             },
-            onSaved: (String value) {
-              _professionalMap['endmonth'] = value.toUpperCase();
-            },
+            value: endmonth,
+            items: months.map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
           ),
         ),
       ],
@@ -144,6 +190,11 @@ class _UpdateProfessionalDetailsState extends State<UpdateProfessionalDetails> {
     this.location = widget.location;
     this.designation = widget.designation;
     this.startmonth = widget.startmonth;
+
+    _professionalMap['startyear'] = startyear;
+    _professionalMap['startmonth'] = startmonth;
+    _professionalMap['endyear'] = endyear;
+    _professionalMap['endmonth'] = endmonth;
 
     if (endyear == 'present') {
       val = true;
@@ -240,8 +291,25 @@ class _UpdateProfessionalDetailsState extends State<UpdateProfessionalDetails> {
               icon: Icon(Icons.check),
               color: Colors.white,
               onPressed: () {
-                if (!_formKey.currentState.validate()) {
-                  return;
+                if (!_formKey.currentState.validate() ||
+                    int.parse(_professionalMap['startyear']) >
+                        int.parse(_professionalMap['endyear'])) {
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext contect) {
+                        return AlertDialog(
+                          title: Text('Oops!'),
+                          content: Text('End Year is less than Start Year'),
+                          actions: <Widget>[
+                            FlatButton(
+                              child: Text('OK'),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                            )
+                          ],
+                        );
+                      });
                 } else {
                   _formKey.currentState.save();
                   checkConnectivity();
@@ -347,55 +415,46 @@ class _UpdateProfessionalDetailsState extends State<UpdateProfessionalDetails> {
                               width: 25.0,
                             ),
                             Container(
-                              width: 100.0,
-                              child: TextFormField(
-                                decoration: new InputDecoration(
-                                  hintText: "Start Year",
-                                ),
-                                initialValue: startyear,
-                                maxLength: 4,
-                                keyboardType: TextInputType.number,
-                                validator: (String value) {
-                                  if (value.isEmpty ||
-                                      value.length > 4 ||
-                                      value.length < 4 ||
-                                      !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
-                                          .hasMatch(value) ||
-                                      !(int.parse(value) >= 1980) ||
-                                      !(int.parse(value) <= 2022)) {
-                                    return 'Invalid Year';
-                                  }
+                              child: DropdownButton(
+                                hint: Text('Start Year'),
+                                onChanged: (newValue) {
+                                  setState(() {
+                                    startyear = "${newValue}";
+                                    saalstart = "${startyear}";
+                                    _professionalMap['startyear'] = saalstart;
+                                  });
                                 },
-                                onSaved: (String value) {
-                                  _professionalMap['startyear'] = value;
-                                },
+                                value: int.parse(startyear),
+                                items: getList()
+                                    .map<DropdownMenuItem<int>>((int value) {
+                                  return DropdownMenuItem<int>(
+                                    value: value,
+                                    child: Text(value.toString()),
+                                  );
+                                }).toList(),
                               ),
                             ),
                             SizedBox(
                               width: 40.0,
                             ),
                             Container(
-                              width: 100.0,
-                              child: TextFormField(
-                                decoration: new InputDecoration(
-                                  hintText: "Start Month",
-                                ),
-                                initialValue: startmonth,
-                                maxLength: 3,
-                                validator: (String value) {
-                                  if (value.isEmpty ||
-                                      value.length > 3 ||
-                                      value.length < 3 ||
-                                      RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
-                                          .hasMatch(value) ||
-                                      !checkMonth(value.toUpperCase())) {
-                                    return 'Invalid Month';
-                                  }
+                              child: DropdownButton(
+                                hint: Text('Start Month'),
+                                onChanged: (newValue) {
+                                  setState(() {
+                                    startmonth = "${newValue}";
+                                    mStart = "${startmonth}";
+                                    _professionalMap['startmonth'] = mStart;
+                                  });
                                 },
-                                onSaved: (String value) {
-                                  _professionalMap['startmonth'] =
-                                      value.toUpperCase();
-                                },
+                                value: startmonth,
+                                items: months.map<DropdownMenuItem<String>>(
+                                    (String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value),
+                                  );
+                                }).toList(),
                               ),
                             ),
                           ],

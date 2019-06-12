@@ -173,6 +173,7 @@ class Modal extends StatefulWidget {
   }
 
   void openSettings(BuildContext context, String userid, DocumentSnapshot docref) {
+
     showModalBottomSheet(
         context: context,
         builder: (BuildContext context) {
@@ -190,7 +191,7 @@ class Modal extends StatefulWidget {
                     Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                            builder: (BuildContext context) => Conversion()));
+                            builder: (BuildContext context) => Conversion(pdfPersonalDetails: docref,)));
                   },
                   child: Row(
                     children: <Widget>[
@@ -469,11 +470,8 @@ class _ModalState extends State<Modal> {
     authService.getCurrentuser().then((userid) {
       widget.userid = userid;
     });
-    print('modal :' + widget.userid);
-    widget.db.document('44stl9raKpTz3pNf7fKeIxv9IO63').get().then((docref) {
-      widget.name = docref['displayName'];
-      print(widget.name);
-    });
+
+
   }
 
   @override

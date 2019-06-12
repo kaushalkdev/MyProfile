@@ -16,6 +16,10 @@ class EducationForm extends StatefulWidget {
 }
 
 class _EducationFormState extends State<EducationForm> {
+  int newYearStart, newYearEnd;
+  String saalstart = "2019";
+  String saalend = "2019";
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String userId = '';
   final Map<String, dynamic> _educationallMap = {
@@ -110,8 +114,25 @@ class _EducationFormState extends State<EducationForm> {
               icon: Icon(Icons.check),
               color: Colors.white,
               onPressed: () {
-                if (!_formKey.currentState.validate()) {
-                  return;
+                if (!_formKey.currentState.validate() ||
+                    int.parse(_educationallMap['startyear']) >
+                        int.parse(_educationallMap['endyear'])) {
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext contect) {
+                        return AlertDialog(
+                          title: Text('Oops!'),
+                          content: Text('End Year is less than Start Year'),
+                          actions: <Widget>[
+                            FlatButton(
+                              child: Text('OK'),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                            )
+                          ],
+                        );
+                      });
                 } else {
                   _formKey.currentState.save();
 
@@ -207,26 +228,23 @@ class _EducationFormState extends State<EducationForm> {
                               ),
                               Container(
                                 width: 100.0,
-                                child: TextFormField(
-                                  decoration: new InputDecoration(
-                                    hintText: "Start Year",
-                                  ),
-                                  maxLength: 4,
-                                  keyboardType: TextInputType.number,
-                                  validator: (String value) {
-                                    if (value.isEmpty ||
-                                        value.length > 4 ||
-                                        value.length < 4 ||
-                                        !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
-                                            .hasMatch(value) ||
-                                        !(int.parse(value) >= 1980) ||
-                                        !(int.parse(value) <= 2022)) {
-                                      return 'Invalid Year';
-                                    }
+                                child: DropdownButton(
+                                  hint: Text('Start Year'),
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      newYearStart = newValue;
+                                      saalstart = "${newYearStart}";
+                                    });
+                                    _educationallMap['startyear'] = saalstart;
                                   },
-                                  onSaved: (String value) {
-                                    _educationallMap['startyear'] = value;
-                                  },
+                                  value: newYearStart,
+                                  items: getList()
+                                      .map<DropdownMenuItem<int>>((int value) {
+                                    return DropdownMenuItem<int>(
+                                      value: value,
+                                      child: Text(value.toString()),
+                                    );
+                                  }).toList(),
                                 ),
                               ),
                               SizedBox(
@@ -234,26 +252,42 @@ class _EducationFormState extends State<EducationForm> {
                               ),
                               Container(
                                 width: 100.0,
-                                child: TextFormField(
-                                  decoration: new InputDecoration(
-                                    hintText: "End Year",
-                                  ),
-                                  maxLength: 4,
-                                  keyboardType: TextInputType.number,
-                                  validator: (String value) {
-                                    if (value.isEmpty ||
-                                        value.length > 4 ||
-                                        !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
-                                            .hasMatch(value) ||
-                                        value.length < 4 ||
-                                        !(int.parse(value) >= 1980) ||
-                                        !(int.parse(value) <= 2022)) {
-                                      return 'Invalid Year';
+                                child: DropdownButton(
+                                  hint: Text('End Year'),
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      newYearEnd = newValue;
+                                      saalend = "${newYearEnd}";
+                                    });
+                                    if (newYearEnd < newYearStart) {
+                                      showDialog(
+                                          context: context,
+                                          builder: (BuildContext contect) {
+                                            return AlertDialog(
+                                              title: Text('Oops!'),
+                                              content: Text(
+                                                  'End Year is less than Start Year'),
+                                              actions: <Widget>[
+                                                FlatButton(
+                                                  child: Text('OK'),
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                )
+                                              ],
+                                            );
+                                          });
                                     }
+                                    _educationallMap['endyear'] = saalend;
                                   },
-                                  onSaved: (String value) {
-                                    _educationallMap['endyear'] = value;
-                                  },
+                                  value: newYearEnd,
+                                  items: getList()
+                                      .map<DropdownMenuItem<int>>((int value) {
+                                    return DropdownMenuItem<int>(
+                                      value: value,
+                                      child: Text(value.toString()),
+                                    );
+                                  }).toList(),
                                 ),
                               ),
                             ],
@@ -303,5 +337,15 @@ class _EducationFormState extends State<EducationForm> {
                   ],
                 ),
               ));
+  }
+
+  List<int> getList() {
+    List<int> year = new List<int>();
+    int y = 1980;
+    for (var i = y; i <= 2019; i++) {
+      year.add(y);
+      y = y + 1;
+    }
+    return year;
   }
 }

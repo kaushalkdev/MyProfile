@@ -283,9 +283,6 @@ class _EducationalDetailsState extends State<EducationalDetails> {
           ],
           backgroundColor: Color(0xFF4074c4),
         ),
-        bottomNavigationBar: BottomAppBar(
-          child: _buildButtons(),
-        ),
         body: Column(
           children: <Widget>[
             Expanded(

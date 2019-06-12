@@ -31,6 +31,10 @@ class UpdateEducationDetails extends StatefulWidget {
 }
 
 class _UpdateEducationDetailsState extends State<UpdateEducationDetails> {
+  int newYearStart, newYearEnd;
+  String saalstart = "2019";
+  String saalend = "2019";
+
   String userId = '';
   String institute = '';
   String degree = '';
@@ -101,6 +105,9 @@ class _UpdateEducationDetailsState extends State<UpdateEducationDetails> {
     this.description = widget.description;
     this.documentRef = widget.documentRef;
 
+    _educationallMap['startyear'] = startyear;
+    _educationallMap['endyear'] = endyear;
+
     checkConnectivity();
   }
 
@@ -142,8 +149,25 @@ class _UpdateEducationDetailsState extends State<UpdateEducationDetails> {
               icon: Icon(Icons.check),
               color: Colors.white,
               onPressed: () {
-                if (!_formKey.currentState.validate()) {
-                  return;
+                if (!_formKey.currentState.validate() ||
+                    int.parse(_educationallMap['startyear']) >
+                        int.parse(_educationallMap['endyear'])) {
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext contect) {
+                        return AlertDialog(
+                          title: Text('Oops!'),
+                          content: Text('End Year is less than Start Year'),
+                          actions: <Widget>[
+                            FlatButton(
+                              child: Text('OK'),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                            )
+                          ],
+                        );
+                      });
                 } else {
                   _formKey.currentState.save();
                   checkConnectivity();
@@ -240,28 +264,24 @@ class _UpdateEducationDetailsState extends State<UpdateEducationDetails> {
                                 width: 25.0,
                               ),
                               Container(
-                                width: 90.0,
-                                child: TextFormField(
-                                  decoration: new InputDecoration(
-                                    hintText: "Start Year",
-                                  ),
-                                  maxLength: 4,
-                                  keyboardType: TextInputType.number,
-                                  initialValue: startyear,
-                                  validator: (String value) {
-                                    if (value.isEmpty ||
-                                        value.length > 4 ||
-                                        value.length < 4 ||
-                                        !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
-                                            .hasMatch(value) ||
-                                        !(int.parse(value) >= 1980) ||
-                                        !(int.parse(value) <= 2022)) {
-                                      return 'Invalid Year';
-                                    }
+                                child: DropdownButton(
+                                  hint: Text('Start Year'),
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      startyear = "${newValue}";
+                                      saalstart = "${startyear}";
+                                      newYearStart = int.parse(startyear);
+                                      _educationallMap['startyear'] = saalstart;
+                                    });
                                   },
-                                  onSaved: (String value) {
-                                    _educationallMap['startyear'] = value;
-                                  },
+                                  value: int.parse(startyear),
+                                  items: getList()
+                                      .map<DropdownMenuItem<int>>((int value) {
+                                    return DropdownMenuItem<int>(
+                                      value: value,
+                                      child: Text(value.toString()),
+                                    );
+                                  }).toList(),
                                 ),
                               ),
                               SizedBox(
@@ -269,27 +289,45 @@ class _UpdateEducationDetailsState extends State<UpdateEducationDetails> {
                               ),
                               Container(
                                 width: 90.0,
-                                child: TextFormField(
-                                  decoration: new InputDecoration(
-                                    hintText: "End Year",
-                                  ),
-                                  initialValue: endyear,
-                                  maxLength: 4,
-                                  keyboardType: TextInputType.number,
-                                  validator: (String value) {
-                                    if (value.isEmpty ||
-                                        value.length > 4 ||
-                                        !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
-                                            .hasMatch(value) ||
-                                        value.length < 4 ||
-                                        !(int.parse(value) >= 1980) ||
-                                        !(int.parse(value) <= 2022)) {
-                                      return 'Invalid Year';
+                                child: DropdownButton(
+                                  hint: Text('End Year'),
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      endyear = "${newValue}";
+                                      saalend = "${endyear}";
+                                      newYearEnd = int.parse(endyear);
+                                    });
+
+                                    if (newYearEnd < newYearStart) {
+                                      showDialog(
+                                          context: context,
+                                          builder: (BuildContext contect) {
+                                            return AlertDialog(
+                                              title: Text('Oops!'),
+                                              content: Text(
+                                                  'End Year is less than Start Year'),
+                                              actions: <Widget>[
+                                                FlatButton(
+                                                  child: Text('OK'),
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                )
+                                              ],
+                                            );
+                                          });
                                     }
+
+                                    _educationallMap['endyear'] = saalend;
                                   },
-                                  onSaved: (String value) {
-                                    _educationallMap['endyear'] = value;
-                                  },
+                                  value: int.parse(endyear),
+                                  items: getList()
+                                      .map<DropdownMenuItem<int>>((int value) {
+                                    return DropdownMenuItem<int>(
+                                      value: value,
+                                      child: Text(value.toString()),
+                                    );
+                                  }).toList(),
                                 ),
                               ),
                             ],
@@ -340,5 +378,15 @@ class _UpdateEducationDetailsState extends State<UpdateEducationDetails> {
                   ],
                 ),
               ));
+  }
+
+  List<int> getList() {
+    List<int> year = new List<int>();
+    int y = 1980;
+    for (var i = y; i <= 2019; i++) {
+      year.add(y);
+      y = y + 1;
+    }
+    return year;
   }
 }

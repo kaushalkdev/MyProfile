@@ -296,9 +296,7 @@ class _ProfessionalDetailsState extends State<ProfessionalDetails> {
           ],
           backgroundColor: Color(0xFF4074c4),
         ),
-        bottomNavigationBar: BottomAppBar(
-          child: _buildButtons(),
-        ),
+
         body: Column(
           children: <Widget>[
             Expanded(

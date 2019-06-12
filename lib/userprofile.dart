@@ -10,6 +10,7 @@ import 'personaldetails.dart';
 import 'modal.dart';
 import 'package:connectivity/connectivity.dart';
 import 'auth.dart';
+import 'Tabs.dart';
 import 'welcomescreen.dart';
 import 'dart:io';
 
@@ -102,7 +103,6 @@ class _userProfileState extends State<userProfile> {
             return new Text(" ");
           }
           var userDocument = snapshot.data;
-          setData(userDocument);
 
           return Text(
             userDocument['displayName'],
@@ -224,6 +224,8 @@ class _userProfileState extends State<userProfile> {
     );
   }
 
+  Map<String, dynamic> pdfPersonal = new Map();
+
   Widget _buildBio(BuildContext context, String useId) {
     TextStyle bioTextStyle = TextStyle(
       fontFamily: 'Spectral',
@@ -341,13 +343,22 @@ class _userProfileState extends State<userProfile> {
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: null,
-      bottomNavigationBar: Visibility(
+      floatingActionButton: Visibility(
         visible: _visibleProfile,
-        child: BottomAppBar(
-          child: _buildButtons(),
+        child: FloatingActionButton(
+          elevation: 20,
+          child: Icon(Icons.view_carousel),
+          backgroundColor: Color(0xFF4074c4),
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (BuildContext context) => TabScreen()));
+          },
         ),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+
       body: Stack(
         children: <Widget>[
           ListView(
@@ -397,13 +408,5 @@ class _userProfileState extends State<userProfile> {
         ],
       ),
     );
-  }
-
-  Future setData(userDocument) async{
-    setState(() {
-      this.documentSnapshot = documentSnapshot;
-      print('document snapshot:  '+ documentSnapshot.toString());
-    });
-
   }
 }

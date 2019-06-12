@@ -15,6 +15,13 @@ class ProfessionalForm extends StatefulWidget {
 }
 
 class _ProfessionalFormState extends State<ProfessionalForm> {
+  int newYearStart, newYearEnd;
+  String newMonthStart, newMonthEnd;
+  String saalstart = "2019";
+  String saalend = "2019";
+  String mStart = "2019";
+  String mEnd = "2019";
+
   String userid = '';
   final Map<String, dynamic> _professionalMap = {
     'company': null,
@@ -46,46 +53,62 @@ class _ProfessionalFormState extends State<ProfessionalForm> {
           width: 25.0,
         ),
         Container(
-          width: 100.0,
-          child: TextFormField(
-            decoration: InputDecoration(hintText: 'End Year'),
-            keyboardType: TextInputType.number,
-            maxLength: 4,
-            validator: (String value) {
-              if (value.isEmpty ||
-                  value.length > 4 ||
-                  value.length < 4 ||
-                  !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$').hasMatch(value) ||
-                  !(int.parse(value) >= 1980) ||
-                  !(int.parse(value) <= 2022)) {
-                return 'Invalid Year';
+          child: DropdownButton(
+            hint: Text('End Year'),
+            onChanged: (newValue) {
+              setState(() {
+                newYearEnd = newValue;
+                saalend = "${newYearEnd}";
+              });
+              if (newYearEnd < newYearStart) {
+                showDialog(
+                    context: context,
+                    builder: (BuildContext contect) {
+                      return AlertDialog(
+                        title: Text('Oops!'),
+                        content: Text('End Year is less than Start Year'),
+                        actions: <Widget>[
+                          FlatButton(
+                            child: Text('OK'),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          )
+                        ],
+                      );
+                    });
               }
+              _professionalMap['endyear'] = saalend;
             },
-            onSaved: (String value) {
-              _professionalMap['endyear'] = value;
-            },
+            value: newYearEnd,
+            items: getList().map<DropdownMenuItem<int>>((int value) {
+              return DropdownMenuItem<int>(
+                value: value,
+                child: Text(value.toString()),
+              );
+            }).toList(),
           ),
         ),
         SizedBox(
           width: 40.0,
         ),
         Container(
-          width: 90.0,
-          child: TextFormField(
-            decoration: InputDecoration(hintText: 'End Month'),
-            maxLength: 3,
-            validator: (String value) {
-              if (value.isEmpty ||
-                  value.length > 3 ||
-                  value.length < 3 ||
-                  RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$').hasMatch(value) ||
-                  !checkMonth(value.toUpperCase())) {
-                return 'Not valid Month';
-              }
+          child: DropdownButton(
+            hint: Text('End Month'),
+            onChanged: (newValue) {
+              setState(() {
+                newMonthEnd = newValue;
+                mEnd = "${newMonthEnd}";
+              });
+              _professionalMap['endmonth'] = mEnd;
             },
-            onSaved: (String value) {
-              _professionalMap['endmonth'] = value.toUpperCase();
-            },
+            value: newMonthEnd,
+            items: months.map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
           ),
         ),
       ],
@@ -173,8 +196,25 @@ class _ProfessionalFormState extends State<ProfessionalForm> {
               icon: Icon(Icons.check),
               color: Colors.white,
               onPressed: () {
-                if (!_formKey.currentState.validate()) {
-                  return;
+                if (!_formKey.currentState.validate() ||
+                    int.parse(_professionalMap['startyear']) >
+                        int.parse(_professionalMap['endyear'])) {
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext contect) {
+                        return AlertDialog(
+                          title: Text('Oops!'),
+                          content: Text('End Year is less than Start Year'),
+                          actions: <Widget>[
+                            FlatButton(
+                              child: Text('OK'),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                            )
+                          ],
+                        );
+                      });
                 } else {
                   _formKey.currentState.save();
                   checkConnectivity();
@@ -278,53 +318,46 @@ class _ProfessionalFormState extends State<ProfessionalForm> {
                               width: 25.0,
                             ),
                             Container(
-                              width: 100.0,
-                              child: TextFormField(
-                                keyboardType: TextInputType.number,
-                                maxLength: 4,
-                                decoration: new InputDecoration(
-                                  hintText: "Start Year",
-                                ),
-                                validator: (String value) {
-                                  if (value.isEmpty ||
-                                      value.length > 4 ||
-                                      value.length < 4 ||
-                                      !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
-                                          .hasMatch(value) ||
-                                      !(int.parse(value) >= 1980) ||
-                                      !(int.parse(value) <= 2022)) {
-                                    return 'Invalid Year';
-                                  }
+                              child: DropdownButton(
+                                hint: Text('Start Year'),
+                                onChanged: (newValue) {
+                                  setState(() {
+                                    newYearStart = newValue;
+                                    saalstart = "${newYearStart}";
+                                  });
+                                  _professionalMap['startyear'] = saalstart;
                                 },
-                                onSaved: (String value) {
-                                  _professionalMap['startyear'] = value;
-                                },
+                                value: newYearStart,
+                                items: getList()
+                                    .map<DropdownMenuItem<int>>((int value) {
+                                  return DropdownMenuItem<int>(
+                                    value: value,
+                                    child: Text(value.toString()),
+                                  );
+                                }).toList(),
                               ),
                             ),
                             SizedBox(
                               width: 40.0,
                             ),
                             Container(
-                              width: 100.0,
-                              child: TextFormField(
-                                decoration: new InputDecoration(
-                                  hintText: "Start Month",
-                                ),
-                                maxLength: 3,
-                                validator: (String value) {
-                                  if (value.isEmpty ||
-                                      value.length > 3 ||
-                                      value.length < 3 ||
-                                      RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
-                                          .hasMatch(value) ||
-                                      !checkMonth(value.toUpperCase())) {
-                                    return 'Invalid Month';
-                                  }
+                              child: DropdownButton(
+                                hint: Text('Start Month'),
+                                onChanged: (newValue) {
+                                  setState(() {
+                                    newMonthStart = newValue;
+                                    mStart = "${newMonthStart}";
+                                  });
+                                  _professionalMap['startmonth'] = mStart;
                                 },
-                                onSaved: (String value) {
-                                  _professionalMap['startmonth'] =
-                                      value.toUpperCase();
-                                },
+                                value: newMonthStart,
+                                items: months.map<DropdownMenuItem<String>>(
+                                    (String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value),
+                                  );
+                                }).toList(),
                               ),
                             ),
                           ],
@@ -438,4 +471,29 @@ class _ProfessionalFormState extends State<ProfessionalForm> {
     }
     return false;
   }
+
+  List<int> getList() {
+    List<int> year = new List<int>();
+    int y = 1980;
+    for (var i = y; i <= 2019; i++) {
+      year.add(y);
+      y = y + 1;
+    }
+    return year;
+  }
+
+  List<String> months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sept',
+    'Oct',
+    'Nov',
+    'Dec'
+  ];
 }
