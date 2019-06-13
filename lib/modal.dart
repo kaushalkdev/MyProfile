@@ -12,12 +12,12 @@ import 'auth.dart';
 import 'dart:io';
 import 'main.dart';
 
-class Modal extends StatefulWidget {
+class Modal {
   AuthService authService = new AuthService();
   CollectionReference db = Firestore.instance.collection('users');
 
   File _image;
-  String userid = 'somwthing', name, email, address;
+  String userid, name, email, address;
 
   checkConnectivity(BuildContext context) async {
     var result = await Connectivity().checkConnectivity();
@@ -172,13 +172,8 @@ class Modal extends StatefulWidget {
     return pdf.save();
   }
 
-
-
   void openSettings(
       BuildContext context, String userid, DocumentSnapshot docref) {
-
-
-
     showModalBottomSheet(
         context: context,
         builder: (BuildContext context) {
@@ -250,37 +245,48 @@ class Modal extends StatefulWidget {
   }
 
   Widget updateStatus(BuildContext context, String userId) {
+    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
     Navigator.pop(context);
     showDialog(
         context: context,
         builder: (BuildContext context) {
-          String status = '';
+          String status;
           return AlertDialog(
             title: Text('Update Status'),
-            content: new Row(
-              children: <Widget>[
-                new Expanded(
-                    child: new TextFormField(
-                  autofocus: true,
-                  decoration: new InputDecoration(
-                      labelText: 'Status', hintText: 'eg. Sowtware Developer.'),
-                  validator: (String value) {
-                    if (value.isEmpty ||
-                        RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
-                            .hasMatch(value)) {
-                      return 'Please fill valid Status';
-                    }
-                  },
-                  onSaved: (value) {
-                    status = value;
-                  },
-                ))
-              ],
+            content: Form(
+              key:_formKey,
+              child: new Row(
+                children: <Widget>[
+                  new Expanded(
+                      child: new TextFormField(
+                        autofocus: true,
+                        decoration: new InputDecoration(
+                            labelText: 'Status',
+                            hintText: 'eg. Sowtware Developer.'),
+                        validator: (String value) {
+                          if (value.isEmpty ||
+                              RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
+                                  .hasMatch(value)) {
+                            return 'Please fill valid Status';
+                          }
+                        },
+                        onSaved: (value) {
+                          status = value;
+                        },
+                      ))
+                ],
+              ),
             ),
             actions: <Widget>[
               FlatButton(
                 child: Text('Update'),
                 onPressed: () {
+                  if(!_formKey.currentState.validate()){
+
+                    return;
+                  }
+                  _formKey.currentState.save();
                   updateStatusdata(userId, status);
                   Navigator.of(context).pop(status);
                 },
@@ -291,37 +297,48 @@ class Modal extends StatefulWidget {
   }
 
   Widget updateBio(BuildContext context, String userId) {
+    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
     Navigator.pop(context);
     showDialog(
         context: context,
         builder: (BuildContext context) {
-          String bio = '';
+          String bio;
           return AlertDialog(
             title: Text('Update Bio'),
-            content: new Row(
-              children: <Widget>[
-                new Expanded(
-                    child: new TextFormField(
-                  autofocus: true,
-                  decoration: new InputDecoration(
-                      labelText: 'Bio', hintText: ' Describle your self.'),
-                  validator: (String value) {
-                    if (value.isEmpty ||
-                        RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
-                            .hasMatch(value)) {
-                      return 'Please fill valid Bio';
-                    }
-                  },
-                  onSaved: (value) {
-                    bio = value;
-                  },
-                ))
-              ],
+            content: Form(
+              key: _formKey,
+              child: new Row(
+                children: <Widget>[
+                  new Expanded(
+                      child: new TextFormField(
+                        autofocus: true,
+                        decoration: new InputDecoration(
+                            labelText: 'Bio', hintText: ' Describle your self.'),
+                        validator: (String value) {
+                          if (value.isEmpty ||
+                              RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$')
+                                  .hasMatch(value)) {
+                            return 'Please fill valid Bio';
+                          }
+                        },
+                        onSaved: (value) {
+                          bio = value;
+                        },
+                      ))
+                ],
+              ),
             ),
             actions: <Widget>[
               FlatButton(
                 child: Text('Update'),
                 onPressed: () {
+
+
+                  if(!_formKey.currentState.validate()){
+
+                    return;
+                  }
+                  _formKey.currentState.save();
                   updateBiodata(userId, bio);
                   Navigator.of(context).pop(bio);
                 },
@@ -463,34 +480,5 @@ class Modal extends StatefulWidget {
         .collection('users')
         .document(userId)
         .setData({"status": value}, merge: true);
-  }
-
-  @override
-  _ModalState createState() => _ModalState();
-}
-
-
-
-
-
-class _ModalState extends State<Modal> {
-
-
-  @override
-  void initState() {
-    super.initState();
-
-    authService.getCurrentuser().then((userid) {
-      widget.userid = userid;
-    });
-
-
-
-  }
-
-  @override
-  Widget build(BuildContext context) {
-
-    return Container();
   }
 }
